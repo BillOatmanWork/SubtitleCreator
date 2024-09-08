@@ -19,18 +19,15 @@ namespace SubtitleCreator
             Console.WriteLine("SubtitleCreator version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
             Console.WriteLine("");
 
-            string txtOutputFile = Path.Combine(System.AppContext.BaseDirectory + "HdHomerun.m3u");
-            string selectedDevice = string.Empty;
+            string ffmpegPath = string.Empty;
+            string inFile = string.Empty;
+            string outputFile = Path.Combine(System.AppContext.BaseDirectory + "HdHomerun.m3u");
+            string model = "medium";
 
             // Read in params
             bool paramsOK = true;
             foreach (string arg in args)
             {
-                if(arg.ToLower() == "-all")
-                {
-                    continue;
-                }
-
                 if (arg.ToLower() == "-?" || arg.ToLower() == "-h" || arg.ToLower() == "-help")
                 {
                     DisplayHelp();
@@ -39,13 +36,25 @@ namespace SubtitleCreator
 
                 switch (arg.Substring(0, arg.IndexOf('=')).ToLower())
                 {
-                    case "-deviceid":
-                        selectedDevice = arg.Substring(arg.IndexOf('=') + 1).Trim();
-                        Console.WriteLine("DeviceID: " + selectedDevice);
+                    case "-ffmpegPath":
+                        ffmpegPath = arg.Substring(arg.IndexOf('=') + 1).Trim();
                         break;
 
-                    case "-out":
-                        txtOutputFile = arg.Substring(arg.IndexOf('=') + 1).Trim();
+                    case "-inFile":
+                        inFile = arg.Substring(arg.IndexOf('=') + 1).Trim();
+                        break;
+
+                    case "-outFile":
+                        outputFile = arg.Substring(arg.IndexOf('=') + 1).Trim();
+                        break;
+
+                    case "-model":
+                        model = arg.Substring(arg.IndexOf('=') + 1).Trim().ToLower();
+                        if (model != "small" && model != "medium" && model != "large")
+                        {
+                            paramsOK = false;
+                            Console.WriteLine("Invalid model: " + model);
+                        }
                         break;
 
                     default:
@@ -60,7 +69,8 @@ namespace SubtitleCreator
                 return;
             }
 
-            Console.WriteLine("Out: " + txtOutputFile);
+            Console.WriteLine("ffmpegPath: " + ffmpegPath);
+            Console.WriteLine("Out: " + outputFile);
             Console.WriteLine("");
 
 
@@ -72,10 +82,9 @@ namespace SubtitleCreator
             Console.WriteLine("SubtitleCreator is a command line utility to generate subtitles for a video file and put into a MKV container.");
             Console.WriteLine("Parameters: (Case Insensitive)");
             Console.WriteLine("");
-            Console.WriteLine("-All[Optional] Put all of the HDHomerun channels in the M3U file.  Default: Only use the favorite (starred) channels.");
-            Console.WriteLine("DeviceID=[Optional] The device ID of your hdmomerun device. Not needed if you only have one device on your network.");
-            Console.WriteLine("Out=[Optional] The fully qualified path where the m3u file that will be created. Default: OTA.m3u in the SubtitleCreator directory.");
+            Console.WriteLine("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is bettwr quakity, but also slower. Default = Medium.");
             Console.WriteLine("");
+            Console.WriteLine(""); Console.WriteLine("");
 
             string example = $"SubtitleCreator ";
 

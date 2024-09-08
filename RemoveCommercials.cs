@@ -324,7 +324,8 @@ namespace SubtitleCreator
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             // Remove all consecutive segments that have the same Text content.  For some reason it happens with some models.
-            segments = RemoveConsecutiveDuplicates(segments);
+         //   segments = RemoveConsecutiveDuplicates(segments);
+         segments = RemoveConsecutiveDuplicatesKeepingLast(segments);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             var outputLanguagecode = languageCode.Length == 0 || shouldTranslate ? "en" : languageCode;
@@ -388,6 +389,28 @@ namespace SubtitleCreator
 
             return result;
         }
+
+        private static List<SegmentData>? RemoveConsecutiveDuplicatesKeepingLast(List<SegmentData> segments)
+        {
+            if (segments == null || segments.Count == 0)
+                return segments;
+
+            List<SegmentData> result = new List<SegmentData>();
+            SegmentData? previous = null;
+
+            for (int i = segments.Count - 1; i >= 0; i--)
+            {
+                var segment = segments[i];
+                if (previous == null || segment.Text != previous.Text)
+                    result.Add(segment);
+
+                previous = segment;
+            }
+
+            result.Reverse();
+            return result;
+        }
+
 
         private static WhisperProcessor? SetupProcessor(string modelPath, string languageCode, bool shouldTranslate, OnSegmentEventHandler OnNewSegment)
         {
