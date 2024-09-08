@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Extensions;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -20,9 +21,12 @@ namespace SubtitleCreator
             Console.WriteLine("");
 
             string ffmpegPath = string.Empty;
-            string inFile = string.Empty;
-            string outputFile = Path.Combine(System.AppContext.BaseDirectory + "HdHomerun.m3u");
+            string inFile = string.Empty;            
             string model = "medium";
+            bool translate = false;
+            string language = string.Empty;
+            bool merge = true;
+            string outputFile = string.Empty;
 
             // Read in params
             bool paramsOK = true;
@@ -32,6 +36,18 @@ namespace SubtitleCreator
                 {
                     DisplayHelp();
                     return;
+                }
+
+                if (arg.ToLower() == "-translate")
+                {
+                    translate = true;
+                    continue;
+                }
+
+                if (arg.ToLower() == "-nomerge")
+                {
+                    merge = false;
+                    continue;
                 }
 
                 switch (arg.Substring(0, arg.IndexOf('=')).ToLower())
@@ -44,8 +60,8 @@ namespace SubtitleCreator
                         inFile = arg.Substring(arg.IndexOf('=') + 1).Trim();
                         break;
 
-                    case "-outFile":
-                        outputFile = arg.Substring(arg.IndexOf('=') + 1).Trim();
+                    case "-language":
+                        language = arg.Substring(arg.IndexOf('=') + 1).Trim();
                         break;
 
                     case "-model":
@@ -69,7 +85,19 @@ namespace SubtitleCreator
                 return;
             }
 
+            if(translate && string.IsNullOrEmpty(language) && language != "en")
+            {
+                Console.WriteLine("Language cannot be specified when translating to English.");
+                return;
+            }
+
+            if(merge == true)
+                outputFile = Path.Combine(inFile.FullFileNameWithoutExtention(), "_subs", ".mkv");
+
+            string srtFile = Path.Combine(inFile.FullFileNameWithoutExtention(), (string.IsNullOrEmpty(language) ? "" : $".{language}"), ".srt");
+
             Console.WriteLine("ffmpegPath: " + ffmpegPath);
+            Console.WriteLine("In: " + inFile);
             Console.WriteLine("Out: " + outputFile);
             Console.WriteLine("");
 
