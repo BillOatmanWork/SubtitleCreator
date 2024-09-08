@@ -28,7 +28,6 @@ namespace SubtitleCreator
             bool merge = true;
             string outputFile = string.Empty;
 
-            // Read in params
             bool paramsOK = true;
             foreach (string arg in args)
             {
@@ -52,11 +51,11 @@ namespace SubtitleCreator
 
                 switch (arg.Substring(0, arg.IndexOf('=')).ToLower())
                 {
-                    case "-ffmpegPath":
+                    case "-ffmpegpath":
                         ffmpegPath = arg.Substring(arg.IndexOf('=') + 1).Trim();
                         break;
 
-                    case "-inFile":
+                    case "-infile":
                         inFile = arg.Substring(arg.IndexOf('=') + 1).Trim();
                         break;
 
@@ -85,21 +84,31 @@ namespace SubtitleCreator
                 return;
             }
 
-            if(translate && string.IsNullOrEmpty(language) && language != "en")
+            if (translate && string.IsNullOrEmpty(language) && language != "en")
             {
-                Console.WriteLine("Language cannot be specified when translating to English.");
-                return;
+                Console.WriteLine("Language cannot be specified when translating to English. Setting to 'en'.");
+                language = "en";
             }
 
-            if(merge == true)
+            if (merge == true)
                 outputFile = Path.Combine(inFile.FullFileNameWithoutExtention(), "_subs", ".mkv");
 
-            string srtFile = Path.Combine(inFile.FullFileNameWithoutExtention(), (string.IsNullOrEmpty(language) ? "" : $".{language}"), ".srt");
+            string fNameLang = string.IsNullOrEmpty(language) ? "" : language;
+            string srtFile = $"{inFile.FullFileNameWithoutExtention()}_{fNameLang}.srt";
 
             Console.WriteLine("ffmpegPath: " + ffmpegPath);
             Console.WriteLine("In: " + inFile);
-            Console.WriteLine("Out: " + outputFile);
+
+            if(merge == true)
+                Console.WriteLine("Out: " + outputFile);
+            else
+                Console.WriteLine("SRT: " + srtFile);
+
             Console.WriteLine("");
+
+            Console.Write("Extracting audio from the video file ... ");
+            string audioFilePath = AudioExtractor.ExtractAudioFromVideoFile(inFile);
+            Console.WriteLine("Audio extraction complete.");
 
 
         }

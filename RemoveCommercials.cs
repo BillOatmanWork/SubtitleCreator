@@ -239,15 +239,6 @@ namespace SubtitleCreator
 
             return true;
         }
-        public string DoWorkExtractAudio(out string status)
-        {
-            string finalFile = $"{videoFilePath.FullFileNameWithoutExtention()}_final.mp4";
-            string outputFilePath = AudioExtractor.ExtractAudioFromVideoFile(finalFile);
-
-            status = "Audio Extraction Complete.";
-
-            return outputFilePath;
-        }
 
         public string DoWorkGenerateSubtitles(out string status, string wavFilePath, ModelType modelType, string appDataDir)
         {
