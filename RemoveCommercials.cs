@@ -12,241 +12,14 @@ namespace SubtitleCreator
 
     public class RemoveCommercials
     {
-        private string videoFilePath;
-        private List<EdlSequence> commercialList = new List<EdlSequence>();
-        private List<EdlSequence> commercialListInitial;
-        private string ffmpegPath;
-        private int leadSeconds;
-        private int endSeconds;
-        private double bitRate = 0.0;
-        private static string fileNameIdentifier = "!ComRemover!";
-
-        public RemoveCommercials(string _videoFilePath, string _ffmpegPath, List<EdlSequence> _commercialListInitial, int _leadSeconds, int _endSeconds)
+        public RemoveCommercials()
         {
-            videoFilePath = _videoFilePath;
-            ffmpegPath = _ffmpegPath;
-            commercialListInitial = _commercialListInitial;
-            leadSeconds = _leadSeconds;
-            endSeconds = _endSeconds;
         }
 
-        public bool DoWorkSetup(out string status, out int commercialCount)
-        {
-            double videoLength = GetVideoDurationAndBitrate(videoFilePath, ffmpegPath, out double _bitRate);
-            bitRate = Math.Round(_bitRate);
 
-            AdjustCommercialList(videoLength);
-            commercialCount = commercialList.Count;
-
-            status = ($"Video length is {videoLength} seconds. Number of commercials is {commercialCount}.");
-
-            return true;
-        }
-
-        /// <summary>
-        /// Remove any commercials that are outside the lead and end seconds.
-        /// </summary>
-        /// <param name="videoLength"></param>
-        private void AdjustCommercialList(double videoLength)
-        {
-            foreach (EdlSequence edl in commercialListInitial)
-            {
-                edl.endSec = edl.endSec + 1;
-
-                if (edl.startSec > leadSeconds && edl.endSec < (videoLength - endSeconds))
-                    commercialList.Add(edl);
-            }
-        }
-
-        public bool DoWorkSplit(out string status)
-        {
-            string finalName = $"{videoFilePath.FullFileNameWithoutExtention()}_processed.mp4";
-            string segmentNameTemplate = $"{videoFilePath.FullFileNameWithoutExtention()}_segment_$$$$$_{fileNameIdentifier}.mp4";
-
-            double videoLength = GetVideoDuration(videoFilePath, ffmpegPath);
-
-            for (int i = 0; i < commercialList.Count; i++)
-            {
-                double startTime = 0;
-                if (i == 0)
-                    startTime = 0;
-                else
-                    startTime = commercialList[i - 1].endSec;
-
-                double endTime = 0;
-
-                if (i == commercialList.Count - 1)
-                    endTime = videoLength;
-                else
-                    endTime = commercialList[i].startSec;
-
-                string segmentNameTemp = segmentNameTemplate.Replace("$$$$$", i.ToString() + "_$$$$$");
-
-                // Extract segment (removing any closed captions
-                string ffmpegArgs = $"-i \"{videoFilePath}\" -ss {startTime} -to {endTime} -bsf:v \"filter_units=remove_types=6\" -c copy \"{segmentNameTemp}\"";
-
-                // Set up the process to run FFmpeg
-                Process ffmpeg = new Process();
-                ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
-                ffmpeg.StartInfo.Arguments = ffmpegArgs;
-                ffmpeg.StartInfo.RedirectStandardError = true;
-                ffmpeg.StartInfo.UseShellExecute = false;
-                ffmpeg.StartInfo.CreateNoWindow = true;
-
-                // Start the process
-                ffmpeg.Start();
-
-                // Read the output
-                string output = ffmpeg.StandardError.ReadToEnd();
-                ffmpeg.WaitForExit();
-            }
-
-            status = "Split Processing Complete.";
-
-            return true;
-        }
-
-        //public bool DoWorkFadeIn(out string status)
-        //{
-        //    string segmentNameTemplate = $"{videoFilePath.FullFileNameWithoutExtention()}_segment_$$$$$_{fileNameIdentifier}.mp4";
-
-        //    for (int i = 0; i < commercialList.Count; i++)
-        //    {
-        //        string segmentNameTemp = segmentNameTemplate.Replace("$$$$$", i.ToString() + "_$$$$$");
-        //        string segmentName = $"{segmentNameTemplate.Replace("$$$$$", i.ToString() + "_fadein_")}";
-
-        //        string ffmpegArgs = $"-i \"{segmentNameTemp}\" -vf \"fade=t=in:st=0:d=2\" -b:v {bitRate}k -c:a copy \"{segmentName}\"";
-
-        //        // Set up the process to run FFmpeg
-        //        Process ffmpeg = new Process();
-        //        ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
-        //        ffmpeg.StartInfo.Arguments = ffmpegArgs;
-        //        ffmpeg.StartInfo.RedirectStandardError = true;
-        //        ffmpeg.StartInfo.UseShellExecute = false;
-        //        ffmpeg.StartInfo.CreateNoWindow = true;
-
-        //        // Start the process
-        //        ffmpeg.Start();
-
-        //        // Read the output
-        //        string output = ffmpeg.StandardError.ReadToEnd();
-        //        ffmpeg.WaitForExit();
-        //    }
-
-        //    status = "Fade In Processing Complete.";
-
-        //    return true;
-        //}
-
-        public bool DoWorkFadeOut(out string status)
-        {
-            string segmentNameTemplate = $"{videoFilePath.FullFileNameWithoutExtention()}_segment_$$$$$_{fileNameIdentifier}.mp4";
-
-            for (int i = 0; i < commercialList.Count; i++)
-            {
-                string segmentNameTemp = segmentNameTemplate.Replace("$$$$$", i.ToString() + "_$$$$$");
-                string segmentName = segmentNameTemp.Replace("$$$$$", "fadeout");
-
-                double fadepoint = Math.Round(GetVideoDuration(segmentNameTemp, ffmpegPath) - 1);
-
-                string ffmpegArgs = $"-i \"{segmentNameTemp}\" -vf \"fade=t=out:st={fadepoint}:d=2\" -b:v {bitRate}k -c:a copy \"{segmentName}\"";
-
-                // Set up the process to run FFmpeg
-                Process ffmpeg = new Process();
-                ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
-                ffmpeg.StartInfo.Arguments = ffmpegArgs;
-                ffmpeg.StartInfo.RedirectStandardError = true;
-                ffmpeg.StartInfo.UseShellExecute = false;
-                ffmpeg.StartInfo.CreateNoWindow = true;
-
-                // Start the process
-                ffmpeg.Start();
-
-                // Read the output
-                string output = ffmpeg.StandardError.ReadToEnd();
-                ffmpeg.WaitForExit();
-            }
-
-            status = "Fade Out Processing Complete.";
-
-            return true;
-        }
-
-        public bool DoWorkConcat(out string status)
-        {          
-            string segmentNameTemplate = $"{videoFilePath.FullFileNameWithoutExtention()}_segment_$$$$$.mp4";
-            string fileList = $"{videoFilePath.FullFileNameWithoutExtention()}_filelist_{fileNameIdentifier}.txt";
-            string concatFile = $"{videoFilePath.FullFileNameWithoutExtention()}_concat_{fileNameIdentifier}.mp4";
-            string ffmpegArgs = $"-f concat -safe 0 -i \"{fileList}\" -c copy \"{concatFile}\"";
-
-            using (StreamWriter sw = File.CreateText(fileList))
-            {
-                for (int i = 0; i < commercialList.Count; i++)
-                {
-                    string segmentName = $"file '{segmentNameTemplate.Replace("$$$$$", i.ToString() + $"_fadeout_{fileNameIdentifier}").Replace("\\", "/")}'";
-                    sw.WriteLine(segmentName);
-                }
-            }
-
-            // Set up the process to run FFmpeg
-            Process ffmpeg = new Process();
-            ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
-            ffmpeg.StartInfo.Arguments = ffmpegArgs;
-            ffmpeg.StartInfo.RedirectStandardError = true;
-            ffmpeg.StartInfo.UseShellExecute = false;
-            ffmpeg.StartInfo.CreateNoWindow = true;
-
-            // Start the process
-            ffmpeg.Start();
-
-            // Read the output
-            string output = ffmpeg.StandardError.ReadToEnd();
-            ffmpeg.WaitForExit();
-
-            status = "Concatenation Complete.";
-
-            return true;
-        }
-
-        public bool DoWorkTrim(out string status)
-        {
-           // string segmentNameTemplate = $"{videoFilePath.FullFileNameWithoutExtention()}_segment_$$$$$_{fileNameIdentifier}.mp4";
-            string concatFile = $"{videoFilePath.FullFileNameWithoutExtention()}_concat_{fileNameIdentifier}.mp4";
-            string finalFile = $"{videoFilePath.FullFileNameWithoutExtention()}_final.mp4"; 
-
-            int duration = (int)GetVideoDuration(concatFile, ffmpegPath);
-            int start = leadSeconds;
-            int end = duration - endSeconds - leadSeconds;
-
-            string ffmpegArgs = $"-i \"{concatFile}\" -ss {start} -t {end} -c copy \"{finalFile}\"";
-
-            // Set up the process to run FFmpeg
-            Process ffmpeg = new Process();
-            ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
-            ffmpeg.StartInfo.Arguments = ffmpegArgs;
-            ffmpeg.StartInfo.RedirectStandardError = true;
-            ffmpeg.StartInfo.UseShellExecute = false;
-            ffmpeg.StartInfo.CreateNoWindow = true;
-
-            // Start the process
-            ffmpeg.Start();
-
-            // Read the output
-            string output = ffmpeg.StandardError.ReadToEnd();
-            ffmpeg.WaitForExit();
-
-            status = $"Trimming Complete. Final file is {finalFile}";
-
-            return true;
-        }
-
-        public string DoWorkGenerateSubtitles(out string status, string wavFilePath, ModelType modelType, string appDataDir)
+        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string appDataDir, string srtFile, string languageCode, bool shouldTranslate)
         {
             List<SegmentData> segments = new();
-            string srtFile = $"{wavFilePath.FullFileNameWithoutExtention()}.srt";
-
-            string languageCode = "en";
-            bool shouldTranslate = false;
 
             GgmlType ggmlType = GgmlType.Base;
 
@@ -289,8 +62,8 @@ namespace SubtitleCreator
 
             if (processor is null)
             {
-                status = "Something went wrong while setting up the processor.";
-                return "";
+                Console.WriteLine("Something went wrong while setting up the processor.");
+                return false;
             }
 
             void OnNewSegment(SegmentData segmentData)
@@ -315,8 +88,8 @@ namespace SubtitleCreator
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             // Remove all consecutive segments that have the same Text content.  For some reason it happens with some models.
-         //   segments = RemoveConsecutiveDuplicates(segments);
-         segments = RemoveConsecutiveDuplicatesKeepingLast(segments);
+            //   segments = RemoveConsecutiveDuplicates(segments);
+            segments = RemoveConsecutiveDuplicatesKeepingLast(segments);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             var outputLanguagecode = languageCode.Length == 0 || shouldTranslate ? "en" : languageCode;
@@ -351,15 +124,15 @@ namespace SubtitleCreator
                     }
 
                     foreach (string part in parts)
-                        writer.WriteLine(part.Trim());                    
-                    
+                        writer.WriteLine(part.Trim());
+
                     writer.WriteLine();
                 }
             }
 
-            status = "Subtitle Generation Complete.";
+            Console.WriteLine("Subtitle Generation Complete.");
 
-            return srtFile;
+            return true;
         }
 
         private static List<SegmentData>? RemoveConsecutiveDuplicates(List<SegmentData> segments)
@@ -421,12 +194,9 @@ namespace SubtitleCreator
             return builder.Build();
         }
 
-        public bool DoWorkMergeSubtitles(out string status, string srtFile)
+        public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath)
         {
-            string finalFile = $"{videoFilePath.FullFileNameWithoutExtention()}_final.mp4";
-            string finalSubsFile = $"{videoFilePath.FullFileNameWithoutExtention()}_final_subs.mp4";
-
-            string ffmpegArgs = $"-i \"{finalFile}\" -i \"{srtFile}\" -c copy -c:s mov_text \"{finalSubsFile}\"";
+            string ffmpegArgs = $"-i \"{finalFile}\" -i \"{srtFile}\" -c copy -c:s srt \"{srtFile}\"";
 
             // Set up the process to run FFmpeg
             Process ffmpeg = new Process();
@@ -443,111 +213,8 @@ namespace SubtitleCreator
             string output = ffmpeg.StandardError.ReadToEnd();
             ffmpeg.WaitForExit();
 
-            status = "Subtitle Merging Complete.";
-
             return true;
         }
-
-        public bool DoWorkCleanup(out string status)
-        {
-            string finalFile = $"{videoFilePath.FullFileNameWithoutExtention()}_final.mp4";
-
-            string? pathToClean = Path.GetDirectoryName(videoFilePath);
-
-            if(pathToClean == null)
-            {
-                status = "Error: Path to clean does not exist or is inaccessible.";
-                return false;
-            }
-
-            try
-            {
-                foreach (string f in Directory.EnumerateFiles(pathToClean, $"*_{fileNameIdentifier}*.*"))
-                    File.Delete(f);
-            }
-            catch { }
-
-            status = $"Cleanup Complete. Final file is {finalFile}";
-
-            return true;
-        }
-
-        public double GetVideoDuration(string filePath, string ffmpegPath)
-        {
-            // Set up the process to run FFmpeg
-            Process ffmpeg = new Process();
-            ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
-            ffmpeg.StartInfo.Arguments = $"-i \"{filePath}\"";
-            ffmpeg.StartInfo.RedirectStandardError = true;
-            ffmpeg.StartInfo.UseShellExecute = false;
-            ffmpeg.StartInfo.CreateNoWindow = true;
-
-            // Start the process
-            ffmpeg.Start();
-
-            // Read the output
-            string output = ffmpeg.StandardError.ReadToEnd();
-            ffmpeg.WaitForExit();
-
-     //       File.WriteAllText("c:\\TestData\\durationOutput.txt", output);
-
-            // Parse the duration from the output
-            string durationString = "Duration: ";
-            int startIndex = output.IndexOf(durationString) + durationString.Length;
-            int endIndex = output.IndexOf(",", startIndex);
-            string time = output.Substring(startIndex, endIndex - startIndex).Trim();
-
-            // Convert the duration to seconds
-            TimeSpan duration = TimeSpan.Parse(time);
-            return duration.TotalSeconds;
-        }
-
-        public double GetVideoDurationAndBitrate(string filePath, string ffmpegPath, out double bitRate)
-        {
-            bitRate = 0.0;
-
-            // Set up the process to run FFmpeg
-            Process ffmpeg = new Process();
-            ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
-            ffmpeg.StartInfo.Arguments = $"-i \"{filePath}\"";
-            ffmpeg.StartInfo.RedirectStandardError = true;
-            ffmpeg.StartInfo.UseShellExecute = false;
-            ffmpeg.StartInfo.CreateNoWindow = true;
-
-            // Start the process
-            ffmpeg.Start();
-
-            // Read the output
-            string output = ffmpeg.StandardError.ReadToEnd();
-            ffmpeg.WaitForExit();
-
-            //       File.WriteAllText("c:\\TestData\\durationOutput.txt", output);
-
-            // Parse the duration from the output
-            string durationString = "Duration: ";
-            int startIndex = output.IndexOf(durationString) + durationString.Length;
-            int endIndex = output.IndexOf(",", startIndex);
-            string time = output.Substring(startIndex, endIndex - startIndex).Trim();
-
-            // Parse the bitrate from the output
-            string bitrateString = "bitrate: ";
-            int startIndexBitrate = output.IndexOf(bitrateString) + bitrateString.Length;
-            int endIndexBitrate = output.IndexOf(" ", startIndexBitrate);
-            string br = output.Substring(startIndexBitrate, endIndexBitrate - startIndexBitrate).Trim();
-            bitRate = Convert.ToDouble(br);
-
-            // Convert the duration to seconds
-            TimeSpan duration = TimeSpan.Parse(time);
-            return duration.TotalSeconds;
-        }
     }
-
-    /// <summary>
-    /// EDL file representation
-    /// </summary>
-    public class EdlSequence
-    {
-        public double startSec { get; set; }
-        public double endSec { get; set; }
-    }
+ 
 }
