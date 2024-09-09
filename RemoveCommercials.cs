@@ -48,21 +48,21 @@ namespace SubtitleCreator
             segments.Clear();
             if (!File.Exists(modelPath))
             {
-                //Console.WriteLine($"Downloading Whisper AI model {modelName}. This might take a while depending on your internet speed..");
-                //Console.WriteLine("The application might exit after downloading. Please restart the application manually in that case!");
+                //Utilities.ConsoleWithLog($"Downloading Whisper AI model {modelName}. This might take a while depending on your internet speed..");
+                //Utilities.ConsoleWithLog("The application might exit after downloading. Please restart the application manually in that case!");
                 // var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(modelType);
                 var modelStream = WhisperGgmlDownloader.GetGgmlModelAsync(ggmlType).GetAwaiter().GetResult();
                 var fileWriter = File.OpenWrite(modelPath);
                 modelStream.CopyTo(fileWriter);
                 fileWriter.Close();
-                //Console.WriteLine("Downloaded model");
+                //Utilities.ConsoleWithLog("Downloaded model");
             }
 
             WhisperProcessor? processor = SetupProcessor(modelPath, languageCode, shouldTranslate, OnNewSegment);
 
             if (processor is null)
             {
-                Console.WriteLine("Something went wrong while setting up the processor.");
+                Utilities.ConsoleWithLog("Something went wrong while setting up the processor.");
                 return false;
             }
 
@@ -70,7 +70,7 @@ namespace SubtitleCreator
             {
                 var startTime = Utilities.ConvertTimestampToSrtFormat(segmentData.Start);
                 var endTime = Utilities.ConvertTimestampToSrtFormat(segmentData.End);
-             //   Console.WriteLine($"CSSS {startTime} ==> {endTime} : {segmentData.Text}");
+             //   Utilities.ConsoleWithLog($"CSSS {startTime} ==> {endTime} : {segmentData.Text}");
                 segments.Add(segmentData);
             }
 
@@ -130,7 +130,7 @@ namespace SubtitleCreator
                 }
             }
 
-            Console.WriteLine("Subtitle Generation Complete.");
+            Utilities.ConsoleWithLog("Subtitle Generation Complete.");
 
             return true;
         }

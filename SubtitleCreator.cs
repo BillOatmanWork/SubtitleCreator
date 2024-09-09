@@ -19,8 +19,10 @@ namespace SubtitleCreator
 
         public void RealMain(string[] args)
         {
-            Console.WriteLine("SubtitleCreator version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
-            Console.WriteLine("");
+            Utilities.CleanLog();
+
+            Utilities.ConsoleWithLog("SubtitleCreator version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+            Utilities.ConsoleWithLog("");
 
             if (!Directory.Exists(appDataDir))
                 Directory.CreateDirectory(appDataDir);
@@ -73,13 +75,13 @@ namespace SubtitleCreator
                         if (model != "small" && model != "medium" && model != "large")
                         {
                             paramsOK = false;
-                            Console.WriteLine("Invalid model: " + model);
+                            Utilities.ConsoleWithLog("Invalid model: " + model);
                         }
                         break;
 
                     default:
                         paramsOK = false;
-                        Console.WriteLine("Unknown parameter: " + arg);
+                        Utilities.ConsoleWithLog("Unknown parameter: " + arg);
                         break;
                 }
             }
@@ -91,7 +93,7 @@ namespace SubtitleCreator
 
             if (translate && string.IsNullOrEmpty(language) && language != "en")
             {
-                Console.WriteLine("Language cannot be specified when translating to English. Setting to 'en'.");
+                Utilities.ConsoleWithLog("Language cannot be specified when translating to English. Setting to 'en'.");
                 language = "en";
             }
 
@@ -101,20 +103,20 @@ namespace SubtitleCreator
             string fNameLang = string.IsNullOrEmpty(language) ? "" : language;
             string srtFile = $"{inFile.FullFileNameWithoutExtention()}_{fNameLang}.srt";
 
-            Console.WriteLine($"ffmpeg Path: {ffmpegPath}");
-            Console.WriteLine($"Input File: {inFile}");
-            Console.WriteLine($"Translate to English: {translate}");
+            Utilities.ConsoleWithLog($"ffmpeg Path: {ffmpegPath}");
+            Utilities.ConsoleWithLog($"Input File: {inFile}");
+            Utilities.ConsoleWithLog($"Translate to English: {translate}");
 
             if (merge == true)
-                Console.WriteLine($"Output File: {outputFile}");
+                Utilities.ConsoleWithLog($"Output File: {outputFile}");
             else
-                Console.WriteLine($"SRT File: {srtFile}");
+                Utilities.ConsoleWithLog($"SRT File: {srtFile}");
 
-            Console.WriteLine("");
+            Utilities.ConsoleWithLog("");
 
             Console.Write("Extracting audio from the video file ... ");
             string audioFilePath = AudioExtractor.ExtractAudioFromVideoFile(inFile);
-            Console.WriteLine("Audio extraction complete.");
+            Utilities.ConsoleWithLog("Audio extraction complete.");
 
             RemoveCommercials removeCommercials = new RemoveCommercials();
 
@@ -134,17 +136,17 @@ namespace SubtitleCreator
 
             Console.Write("Creatng subtitles file. Please be patient ... ");
             bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath,  modelType, appDataDir, srtFile, language, translate);
-            Console.WriteLine("Subtitle creation complete.");
+            Utilities.ConsoleWithLog("Subtitle creation complete.");
 
             if(merge == true)
             {
 
-                Console.WriteLine($"Merge process completed. Merged file {outputFile} created.");
+                Utilities.ConsoleWithLog($"Merge process completed. Merged file {outputFile} created.");
                 File.Delete(srtFile);
             }
             else
             {
-                Console.WriteLine($"Merge process bypassed. Subtitle file {srtFile} created.");
+                Utilities.ConsoleWithLog($"Merge process bypassed. Subtitle file {srtFile} created.");
             }
 
             File.Delete(audioFilePath);
@@ -153,24 +155,24 @@ namespace SubtitleCreator
 
         public void DisplayHelp()
         {
-            Console.WriteLine("");
-            Console.WriteLine("SubtitleCreator is a command line utility to generate subtitles for a video file and put into a MKV container.");
-            Console.WriteLine("Parameters: (Case Insensitive)");
-            Console.WriteLine("");
-            Console.WriteLine("-ffmpegpPath=Path to the ffmpeg executable.  Just the folder, the exe is assumed to be ffmpeg.exe.");
-            Console.WriteLine("-inFile=The video file the subtitles will be generated for.");
-            Console.WriteLine("");
-            Console.WriteLine("Optional: -nomerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted. ");
-            Console.WriteLine("Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.");
-            Console.WriteLine("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. Default is none.");
-            Console.WriteLine("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
-            Console.WriteLine("");
+            Utilities.ConsoleWithLog("");
+            Utilities.ConsoleWithLog("SubtitleCreator is a command line utility to generate subtitles for a video file and put into a MKV container.");
+            Utilities.ConsoleWithLog("Parameters: (Case Insensitive)");
+            Utilities.ConsoleWithLog("");
+            Utilities.ConsoleWithLog("-ffmpegpPath=Path to the ffmpeg executable.  Just the folder, the exe is assumed to be ffmpeg.exe.");
+            Utilities.ConsoleWithLog("-inFile=The video file the subtitles will be generated for.");
+            Utilities.ConsoleWithLog("");
+            Utilities.ConsoleWithLog("Optional: -nomerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted. ");
+            Utilities.ConsoleWithLog("Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.");
+            Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. Default is none.");
+            Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
+            Utilities.ConsoleWithLog("");
 
             string example = $"SubtitleCreator -ffmpegPath=\"Path\to\ffmpeg folder\" -inFile=\"c:\\My Movies\\My Little Pony.ts\" -Model=Large";
 
-            Console.WriteLine("");
+            Utilities.ConsoleWithLog("");
 
-            Console.WriteLine("Hit enter to continue");
+            Utilities.ConsoleWithLog("Hit enter to continue");
             Console.ReadLine();
         }
     }
