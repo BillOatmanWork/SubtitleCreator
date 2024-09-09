@@ -101,13 +101,14 @@ namespace SubtitleCreator
             string fNameLang = string.IsNullOrEmpty(language) ? "" : language;
             string srtFile = $"{inFile.FullFileNameWithoutExtention()}_{fNameLang}.srt";
 
-            Console.WriteLine("ffmpegPath: " + ffmpegPath);
-            Console.WriteLine("In: " + inFile);
+            Console.WriteLine($"ffmpeg Path: {ffmpegPath}");
+            Console.WriteLine($"Input File: {inFile}");
+            Console.WriteLine($"Translate to English: {translate}");
 
-            if(merge == true)
-                Console.WriteLine("Out: " + outputFile);
+            if (merge == true)
+                Console.WriteLine($"Output File: {outputFile}");
             else
-                Console.WriteLine("SRT: " + srtFile);
+                Console.WriteLine($"SRT File: {srtFile}");
 
             Console.WriteLine("");
 
