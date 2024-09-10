@@ -197,7 +197,7 @@ namespace SubtitleCreator
 
         public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath)
         {
-            string ffmpegArgs = $"-i \"{finalFile}\" -i \"{srtFile}\" -c copy -c:s srt \"{finalFile}\"";
+            string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt \"{finalFile}\"";
 
             // Set up the process to run FFmpeg
             Process ffmpeg = new Process();
