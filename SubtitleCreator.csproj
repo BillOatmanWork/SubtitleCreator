@@ -12,8 +12,4 @@
     <PackageReference Include="Whisper.net.Runtime" Version="1.5.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Doc\" />
-  </ItemGroup>
-
 </Project>

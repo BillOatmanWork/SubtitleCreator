@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection.Metadata;
 using Extensions;
 using Whisper.net;
 using Whisper.net.Ggml;
@@ -196,7 +197,7 @@ namespace SubtitleCreator
 
         public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath)
         {
-            string ffmpegArgs = $"-i \"{finalFile}\" -i \"{srtFile}\" -c copy -c:s srt \"{srtFile}\"";
+            string ffmpegArgs = $"-i \"{finalFile}\" -i \"{srtFile}\" -c copy -c:s srt \"{finalFile}\"";
 
             // Set up the process to run FFmpeg
             Process ffmpeg = new Process();

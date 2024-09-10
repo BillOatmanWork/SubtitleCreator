@@ -114,7 +114,7 @@ namespace SubtitleCreator
 
             Utilities.ConsoleWithLog("");
 
-            Console.Write("Extracting audio from the video file ... ");
+            Utilities.ConsoleWithLog("Extracting audio from the video file ... ");
             string audioFilePath = AudioExtractor.ExtractAudioFromVideoFile(inFile);
             Utilities.ConsoleWithLog("Audio extraction complete.");
 
@@ -132,15 +132,16 @@ namespace SubtitleCreator
                 case "large":
                     modelType = ModelType.Large;
                     break;
-            }   
+            }
 
-            Console.Write("Creatng subtitles file. Please be patient ... ");
-            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath,  modelType, appDataDir, srtFile, language, translate);
+            Utilities.ConsoleWithLog("Creatng subtitles file. Please be patient ... ");
+            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, appDataDir, srtFile, language, translate);
             Utilities.ConsoleWithLog("Subtitle creation complete.");
 
             if(merge == true)
             {
-
+                Utilities.ConsoleWithLog("Merge process started.");
+                removeCommercials.DoWorkMergeSubtitles(srtFile, inFile, outputFile, ffmpegPath);
                 Utilities.ConsoleWithLog($"Merge process completed. Merged file {outputFile} created.");
                 File.Delete(srtFile);
             }
@@ -150,7 +151,6 @@ namespace SubtitleCreator
             }
 
             File.Delete(audioFilePath);
-
         }
 
         public void DisplayHelp()
