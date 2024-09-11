@@ -89,8 +89,8 @@ namespace SubtitleCreator
 
 #pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             // Remove all consecutive segments that have the same Text content.  For some reason it happens with some models.
-             segments = RemoveConsecutiveDuplicates(segments);
-          //  segments = RemoveConsecutiveDuplicatesKeepingLast(segments);
+            // segments = RemoveConsecutiveDuplicates(segments);
+            segments = RemoveConsecutiveDuplicatesKeepingLast(segments);
 #pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 
             var outputLanguagecode = languageCode.Length == 0 || shouldTranslate ? "en" : languageCode;

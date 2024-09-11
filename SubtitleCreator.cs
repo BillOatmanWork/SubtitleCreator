@@ -98,7 +98,7 @@ namespace SubtitleCreator
             }
 
             if (merge == true)
-                outputFile = Path.Combine(inFile.FullFileNameWithoutExtention(), "_subs", ".mkv");
+                outputFile = $"{inFile.FullFileNameWithoutExtention()}_subs.mkv";
 
             string fNameLang = string.IsNullOrEmpty(language) ? "" : language;
             string srtFile = $"{inFile.FullFileNameWithoutExtention()}_{fNameLang}.srt";
