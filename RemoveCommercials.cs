@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Reflection.Metadata;
 using Extensions;
 using Whisper.net;
@@ -75,10 +76,41 @@ namespace SubtitleCreator
                 segments.Add(segmentData);
             }
 
+            
+
+            //var audioData = File.ReadAllBytes(wavFilePath);
+            //var mel = model.AudioToMel(audioData);
+            //var (language, probs) = model.DetectLanguage(mel);
+
+            //Console.WriteLine($"Detected language: {language}
+
             using (Stream fileStream = File.OpenRead(wavFilePath))
             {
                 GC.KeepAlive(fileStream);
                 GC.KeepAlive(processor);
+
+                // Read the file stream into a byte array
+                //byte[] audioData;
+                //using (MemoryStream ms = new MemoryStream())
+                //{
+                //    fileStream.CopyTo(ms);
+                //    audioData = ms.ToArray();
+                //}
+
+                //// Convert byte array to float array
+                //// Ensure audioData length is a multiple of 4
+                //int floatArrayLength = audioData.Length / sizeof(float);
+                //float[] floatData = new float[floatArrayLength / 4];
+                //Buffer.BlockCopy(audioData, 0, floatData, 0, (floatArrayLength / 4) * sizeof(float));
+
+                //var detectedLanguage = processor.DetectLanguage(floatData);
+
+                //if(detectedLanguage.Length > 0)
+                //{
+                //    Utilities.ConsoleWithLog($"Detected language: {detectedLanguage}");
+                //}
+
+                //fileStream.Seek(0, SeekOrigin.Begin);
 
                 processor.Process(fileStream);
                 processor.Dispose();
@@ -197,7 +229,7 @@ namespace SubtitleCreator
 
         public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath)
         {
-            string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt \"{finalFile}\"";
+            string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt -metadata:s:s:0 language=eng -map_metadata -1 \"{finalFile}\"";
 
             // Set up the process to run FFmpeg
             Process ffmpeg = new Process();
