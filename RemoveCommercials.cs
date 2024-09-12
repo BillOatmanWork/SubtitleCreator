@@ -90,6 +90,7 @@ namespace SubtitleCreator
                 GC.KeepAlive(processor);
 
                 // Read the file stream into a byte array
+                // *** Note:  Currently there is a bug in DetectLanguage
                 //byte[] audioData;
                 //using (MemoryStream ms = new MemoryStream())
                 //{
