@@ -223,8 +223,8 @@ namespace SubtitleCreator
                 builder.WithLanguageDetection();
 
             if (shouldTranslate)
-            {
-              //  builder.WithLanguage("fr");
+            { 
+                //  builder.WithLanguage("fr");
                 builder.WithLanguage("es");
                 builder.WithTranslate();
 
@@ -235,6 +235,8 @@ namespace SubtitleCreator
 
         public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath)
         {
+            // set audio track to spanins, french
+            // -metadata:s:a:0 language=spa    fra
             string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt -metadata:s:s:0 language=eng -map_metadata -1 \"{finalFile}\"";
 
             // Set up the process to run FFmpeg
