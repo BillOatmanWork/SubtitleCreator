@@ -223,7 +223,12 @@ namespace SubtitleCreator
                 builder.WithLanguageDetection();
 
             if (shouldTranslate)
+            {
+              //  builder.WithLanguage("fr");
+                builder.WithLanguage("es");
                 builder.WithTranslate();
+
+            }
 
             return builder.Build();
         }
