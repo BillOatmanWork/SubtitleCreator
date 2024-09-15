@@ -31,7 +31,8 @@ namespace SubtitleCreator
             string inFile = string.Empty;            
             string model = "medium";
             bool translate = false;
-            string language = string.Empty;
+            string language = "en";
+            string audioLanguage = "eng";
             bool merge = true;
             string outputFile = string.Empty;
 
@@ -70,6 +71,15 @@ namespace SubtitleCreator
                         language = arg.Substring(arg.IndexOf('=') + 1).Trim();
                         break;
 
+                    case "-audiolanguage":
+                        audioLanguage = arg.Substring(arg.IndexOf('=') + 1).Trim().ToLower();
+                        if (audioLanguage != "eng" && audioLanguage != "fra" && audioLanguage != "spa")
+                        {
+                            paramsOK = false;
+                            Utilities.ConsoleWithLog($"Invalid audio language: {audioLanguage}. Possible values are eng = English, fra = French, spa = spanish. English is the default.");
+                        }
+                        break;
+
                     case "-model":
                         model = arg.Substring(arg.IndexOf('=') + 1).Trim().ToLower();
                         if (model != "small" && model != "medium" && model != "large")
@@ -101,10 +111,11 @@ namespace SubtitleCreator
                 outputFile = $"{inFile.FullFileNameWithoutExtention()}_subs.mkv";
 
             string fNameLang = string.IsNullOrEmpty(language) ? "" : language;
-            string srtFile = $"{inFile.FullFileNameWithoutExtention()}_{fNameLang}.srt";
+            string srtFile = $"{inFile.FullFileNameWithoutExtention()}.{fNameLang}.srt";
 
             Utilities.ConsoleWithLog($"ffmpeg Path: {ffmpegPath}");
             Utilities.ConsoleWithLog($"Input File: {inFile}");
+            Utilities.ConsoleWithLog($"Audio Language: {audioLanguage}");
             Utilities.ConsoleWithLog($"Translate to English: {translate}");
 
             if (merge == true)
@@ -134,14 +145,14 @@ namespace SubtitleCreator
                     break;
             }
 
-            Utilities.ConsoleWithLog("Creatng subtitles file. Please be patient ... ");
-            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, appDataDir, srtFile, language, translate);
+            Utilities.ConsoleWithLog("Creating subtitles file. Please be patient ... ");
+            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, appDataDir, srtFile, language, translate, audioLanguage);
             Utilities.ConsoleWithLog("Subtitle creation complete.");
 
             if(merge == true)
             {
                 Utilities.ConsoleWithLog("Merge process started.");
-                removeCommercials.DoWorkMergeSubtitles(srtFile, inFile, outputFile, ffmpegPath);
+                removeCommercials.DoWorkMergeSubtitles(srtFile, inFile, outputFile, ffmpegPath, audioLanguage);
                 Utilities.ConsoleWithLog($"Merge process completed. Merged file {outputFile} created.");
                 File.Delete(srtFile);
             }
@@ -164,6 +175,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("");
             Utilities.ConsoleWithLog("Optional: -nomerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted. ");
             Utilities.ConsoleWithLog("Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.");
+            Utilities.ConsoleWithLog("Optional: -audioLanguage=<language>  The Whisper audio language detection feature has problems now.  So this should be specified if the audio is not in english. Possible values are eng = English, fra = French, spa = spanish. English is the default.");
             Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. Default is none.");
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
             Utilities.ConsoleWithLog("");

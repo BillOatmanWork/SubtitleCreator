@@ -19,7 +19,7 @@ namespace SubtitleCreator
         }
 
 
-        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string appDataDir, string srtFile, string languageCode, bool shouldTranslate)
+        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string appDataDir, string srtFile, string languageCode, bool shouldTranslate, string audioLanguage)
         {
             List<SegmentData> segments = new();
 
@@ -60,7 +60,7 @@ namespace SubtitleCreator
                 //Utilities.ConsoleWithLog("Downloaded model");
             }
 
-            WhisperProcessor? processor = SetupProcessor(modelPath, languageCode, shouldTranslate, OnNewSegment);
+            WhisperProcessor? processor = SetupProcessor(modelPath, languageCode, shouldTranslate, audioLanguage, OnNewSegment);
 
             if (processor is null)
             {
@@ -210,7 +210,7 @@ namespace SubtitleCreator
         }
 
 
-        private static WhisperProcessor? SetupProcessor(string modelPath, string languageCode, bool shouldTranslate, OnSegmentEventHandler OnNewSegment)
+        private static WhisperProcessor? SetupProcessor(string modelPath, string languageCode, bool shouldTranslate, string audioLanguage, OnSegmentEventHandler OnNewSegment)
         {
             var whisperFactory = WhisperFactory.FromPath(modelPath);
 
@@ -224,20 +224,30 @@ namespace SubtitleCreator
 
             if (shouldTranslate)
             { 
-                //  builder.WithLanguage("fr");
-                builder.WithLanguage("es");
-                builder.WithTranslate();
+                switch(audioLanguage)
+                {
+                    case "eng":
+                        builder.WithLanguage("en");
+                        break;
+                    case "fra":
+                        builder.WithLanguage("fr");
+                        break;
+                    case "spa":
+                        builder.WithLanguage("es");
+                        break;
+                }
 
+                builder.WithTranslate();
             }
 
             return builder.Build();
         }
 
-        public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath)
+        public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath, string audioLanguage)
         {
-            // set audio track to spanins, french
-            // -metadata:s:a:0 language=spa    fra
-            string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt -metadata:s:s:0 language=eng -map_metadata -1 \"{finalFile}\"";
+            // set audio track to spanish, french, english
+            // -metadata:s:a:0 language=spa    fra   eng
+            string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt -metadata:s:s:0 language=eng  -metadata:s:a:0 language={audioLanguage} \"{finalFile}\"";
 
             // Set up the process to run FFmpeg
             Process ffmpeg = new Process();
