@@ -1,6 +1,7 @@
 ﻿
 
 using NAudio.Wave;
+using System;
 using System.IO;
 
 namespace SubtitleCreator
@@ -11,59 +12,56 @@ namespace SubtitleCreator
         private static string outputFilePath = string.Empty;
 
 #pragma warning disable CS8604
-        public static string ExtractAudioFromVideoFile(string videoFilePath)
-        {
-            const int outRate = 16000;
-            using (FileStream fileStream = File.OpenRead(videoFilePath))
-            {
-                using (MemoryStream memoryStream = new MemoryStream())
-                {
-                    fileStream.CopyTo(memoryStream);
-                    fileStream.Close();
-                    using (StreamMediaFoundationReader reader = new StreamMediaFoundationReader(memoryStream))
-                    {
-                        WaveFormat outFormat = new WaveFormat(outRate, reader.WaveFormat.Channels);
-                        using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, outFormat))
-                        {
-                            outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath), $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
-                            WaveFileWriter.CreateWaveFile(outputFilePath, resampler);
-                        }
-                    }
-                }
-            }
-
-            return outputFilePath;
-        }
-
         //public static string ExtractAudioFromVideoFile(string videoFilePath)
         //{
         //    const int outRate = 16000;
-        //    const int bufferSize = 81920; // 80 KB buffer size
-        //    string outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath), $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
-
         //    using (FileStream fileStream = File.OpenRead(videoFilePath))
-        //    using (MemoryStream memoryStream = new MemoryStream())
         //    {
-        //        byte[] buffer = new byte[bufferSize];
-        //        int bytesRead;
-        //        while ((bytesRead = fileStream.Read(buffer, 0, bufferSize)) > 0)
+        //        using (MemoryStream memoryStream = new MemoryStream())
         //        {
-        //            memoryStream.Write(buffer, 0, bytesRead);
-        //        }
-
-        //        memoryStream.Position = 0; // Reset the position to the beginning of the stream
-        //        using (StreamMediaFoundationReader reader = new StreamMediaFoundationReader(memoryStream))
-        //        {
-        //            WaveFormat outFormat = new WaveFormat(outRate, reader.WaveFormat.Channels);
-        //            using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, outFormat))
+        //            fileStream.CopyTo(memoryStream);
+        //            fileStream.Close();
+        //            using (StreamMediaFoundationReader reader = new StreamMediaFoundationReader(memoryStream))
         //            {
-        //                WaveFileWriter.CreateWaveFile(outputFilePath, resampler);
+        //                WaveFormat outFormat = new WaveFormat(outRate, reader.WaveFormat.Channels);
+        //                using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, outFormat))
+        //                {
+        //                    outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath), $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
+        //                    WaveFileWriter.CreateWaveFile(outputFilePath, resampler);
+        //                }
         //            }
         //        }
         //    }
 
         //    return outputFilePath;
         //}
+
+        public static string ExtractAudioFromVideoFile(string videoFilePath)
+        {
+            const int outRate = 16000;
+            outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath), $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
+
+            using (var reader = new MediaFoundationReader(videoFilePath))
+            {
+                try
+                {
+                    WaveFormat outFormat = new WaveFormat(outRate, reader.WaveFormat.Channels);
+                    using (var resampler = new MediaFoundationResampler(reader, outFormat))
+                    {
+                        resampler.ResamplerQuality = 60; // Adjust quality if needed
+                        WaveFileWriter.CreateWaveFile(outputFilePath, resampler);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utilities.ConsoleWithLog($"Exception extracting audio from the video file. {ex.Message}");
+                    outputFilePath = string.Empty;
+                }
+            }
+
+            return outputFilePath;
+        }
+
 #pragma warning restore CS8604
     }
 }

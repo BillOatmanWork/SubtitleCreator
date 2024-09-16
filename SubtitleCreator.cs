@@ -127,6 +127,11 @@ namespace SubtitleCreator
 
             Utilities.ConsoleWithLog("Extracting audio from the video file ... ");
             string audioFilePath = AudioExtractor.ExtractAudioFromVideoFile(inFile);
+            if (string.IsNullOrEmpty(audioFilePath))
+            {
+                Utilities.ConsoleWithLog("Audio extraction failed. Exiting.");
+                return;
+            }
             Utilities.ConsoleWithLog("Audio extraction complete.");
 
             RemoveCommercials removeCommercials = new RemoveCommercials();
