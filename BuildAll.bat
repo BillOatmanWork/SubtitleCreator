@@ -6,13 +6,13 @@ dotnet publish -r linux-x64 -c Release /p:PublishSingleFile=true /p:IncludeNativ
 cd \repos\SubtitleCreator\Build
 
 copy /Y "C:\repos\SubtitleCreator\bin\Release\net8.0\win-x64\publish\SubtitleCreator.exe" .
-"C:\Program Files\7-Zip\7z" a -tzip SubtitleCreator-WIN.zip SubtitleCreator.exe
+"C:\Program Files\7-Zip\7z" a -tzip SubtitleCreator-WIN.zip SubtitleCreator.exe SubtitleCreator.pdf
 
 copy /Y "C:\repos\SubtitleCreator\bin\Release\net8.0\osx.10.14-x64\publish\SubtitleCreator" .
-"C:\Program Files\7-Zip\7z" a -t7z SubtitleCreator-OSX.7z SubtitleCreator
+"C:\Program Files\7-Zip\7z" a -t7z SubtitleCreator-OSX.7z SubtitleCreator SubtitleCreator.pdf
 
 copy /Y "C:\repos\SubtitleCreator\bin\Release\net8.0\ubuntu.18.04-x64\publish\SubtitleCreator" .
-"C:\Program Files\7-Zip\7z" a -t7z SubtitleCreator-UBU.7z SubtitleCreator
+"C:\Program Files\7-Zip\7z" a -t7z SubtitleCreator-UBU.7z SubtitleCreator SubtitleCreator.pdf
 
 copy /Y "C:\repos\SubtitleCreator\bin\Release\net8.0\linux-x64\publish\SubtitleCreator" .
-"C:\Program Files\7-Zip\7z" a -t7z SubtitleCreator-LIN64.7z SubtitleCreator
+"C:\Program Files\7-Zip\7z" a -t7z SubtitleCreator-LIN64.7z SubtitleCreator SubtitleCreator.pdf

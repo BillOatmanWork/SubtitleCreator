@@ -172,7 +172,7 @@ namespace SubtitleCreator
         public void DisplayHelp()
         {
             Utilities.ConsoleWithLog("");
-            Utilities.ConsoleWithLog("SubtitleCreator is a command line utility to generate subtitles for a video file and put into a MKV container.");
+            Utilities.ConsoleWithLog("SubtitleCreator is a command line utility to generate subtitles for a video file and optionally put into a MKV container.");
             Utilities.ConsoleWithLog("Parameters: (Case Insensitive)");
             Utilities.ConsoleWithLog("");
             Utilities.ConsoleWithLog("-ffmpegpPath=Path to the ffmpeg executable.  Just the folder, the exe is assumed to be ffmpeg.exe.");
@@ -181,7 +181,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("Optional: -nomerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted. ");
             Utilities.ConsoleWithLog("Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.");
             Utilities.ConsoleWithLog("Optional: -audioLanguage=<language>  The Whisper audio language detection feature has problems now.  So this should be specified if the audio is not in english. Possible values are eng = English, fra = French, spa = spanish. English is the default.");
-            Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. Default is none.");
+            Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is none.");
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
             Utilities.ConsoleWithLog("");
 
