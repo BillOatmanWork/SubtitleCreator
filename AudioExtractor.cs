@@ -6,35 +6,13 @@ using System.IO;
 
 namespace SubtitleCreator
 {
+    /// <summary>
+    /// Extracts audio from a video file.
+    /// </summary>
     public static class AudioExtractor
     {
         private static string fileNameIdentifier = "_!SubtitleCreator!";
         private static string outputFilePath = string.Empty;
-
-#pragma warning disable CS8604
-        //public static string ExtractAudioFromVideoFile(string videoFilePath)
-        //{
-        //    const int outRate = 16000;
-        //    using (FileStream fileStream = File.OpenRead(videoFilePath))
-        //    {
-        //        using (MemoryStream memoryStream = new MemoryStream())
-        //        {
-        //            fileStream.CopyTo(memoryStream);
-        //            fileStream.Close();
-        //            using (StreamMediaFoundationReader reader = new StreamMediaFoundationReader(memoryStream))
-        //            {
-        //                WaveFormat outFormat = new WaveFormat(outRate, reader.WaveFormat.Channels);
-        //                using (MediaFoundationResampler resampler = new MediaFoundationResampler(reader, outFormat))
-        //                {
-        //                    outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath), $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
-        //                    WaveFileWriter.CreateWaveFile(outputFilePath, resampler);
-        //                }
-        //            }
-        //        }
-        //    }
-
-        //    return outputFilePath;
-        //}
 
         public static string ExtractAudioFromVideoFile(string videoFilePath)
         {
@@ -61,7 +39,5 @@ namespace SubtitleCreator
 
             return outputFilePath;
         }
-
-#pragma warning restore CS8604
     }
 }
