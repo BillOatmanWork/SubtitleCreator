@@ -29,7 +29,7 @@ namespace SubtitleCreator
         /// <param name="shouldTranslate"></param>
         /// <param name="audioLanguage"></param>
         /// <returns></returns>
-        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string appDataDir, string srtFile, string languageCode, bool shouldTranslate, string audioLanguage)
+        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string workingDir, string srtFile, string languageCode, bool shouldTranslate, string audioLanguage)
         {
             List<SegmentData> segments = new();
 
@@ -55,7 +55,7 @@ namespace SubtitleCreator
             }
 
             string modelName = Utilities.GgmlTypeToString(ggmlType);
-            string modelPath = Path.Combine(appDataDir, modelName);
+            string modelPath = Path.Combine(workingDir, modelName);
 
             segments.Clear();
             if (!File.Exists(modelPath))

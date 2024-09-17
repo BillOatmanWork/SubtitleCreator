@@ -6,7 +6,7 @@ namespace SubtitleCreator
 {
     class SubtitleCreator
     {
-        public string workingDir = System.Reflection.Assembly.GetExecutingAssembly().Location;
+        public string workingDir = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
 
         static void Main(string[] args)
         {

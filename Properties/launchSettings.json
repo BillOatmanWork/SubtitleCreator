@@ -2,7 +2,7 @@
   "profiles": {
     "SubtitleCreator": {
       "commandName": "Project",
-      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg-2024-08-15-git-1f801dfdb5-full_build\\bin\" -infile=\"C:\\TestData\\Recipe Rehab S02E25.ts\" -model=medium -nomerge"
+      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg-2024-08-15-git-1f801dfdb5-full_build\\bin\" -infile=\"C:\\TestData\\Wheel of Fortune S40E93.mp4\" -model=medium -nomerge"
     }
   }
 }
