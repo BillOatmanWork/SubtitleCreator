@@ -1,14 +1,12 @@
 ﻿using Extensions;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace SubtitleCreator
 {
     class SubtitleCreator
     {
-        public string appDataDir = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\SubtitleCreator\";
+        public string workingDir = System.Reflection.Assembly.GetExecutingAssembly().Location;
 
         static void Main(string[] args)
         {
@@ -23,9 +21,6 @@ namespace SubtitleCreator
 
             Utilities.ConsoleWithLog("SubtitleCreator version " + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
             Utilities.ConsoleWithLog("");
-
-            if (!Directory.Exists(appDataDir))
-                Directory.CreateDirectory(appDataDir);
 
             string ffmpegPath = string.Empty;
             string inFile = string.Empty;            
@@ -97,9 +92,7 @@ namespace SubtitleCreator
             }
 
             if (paramsOK == false)
-            {
                 return;
-            }
 
             if (translate && string.IsNullOrEmpty(language) && language != "en")
             {
@@ -151,7 +144,7 @@ namespace SubtitleCreator
             }
 
             Utilities.ConsoleWithLog("Creating subtitles file. Please be patient ... ");
-            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, appDataDir, srtFile, language, translate, audioLanguage);
+            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, audioLanguage);
             Utilities.ConsoleWithLog("Subtitle creation complete.");
 
             if(merge == true)
@@ -169,6 +162,9 @@ namespace SubtitleCreator
             File.Delete(audioFilePath);
         }
 
+        /// <summary>
+        /// Display help text
+        /// </summary>
         public void DisplayHelp()
         {
             Utilities.ConsoleWithLog("");

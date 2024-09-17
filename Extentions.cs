@@ -1,10 +1,14 @@
 ﻿using System.Globalization;
-using System.Text;
 
 namespace Extensions
 {
     public static class Extensions
     {
+        /// <summary>
+        /// Get the file name and path without the extension
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
         public static string FullFileNameWithoutExtention(this string fileName)
         {
             int lastIndex = fileName.LastIndexOf(".");
@@ -51,6 +55,5 @@ namespace Extensions
         {
             return s.Replace(c.ToString(), string.Empty);
         }
-
     }   
 }

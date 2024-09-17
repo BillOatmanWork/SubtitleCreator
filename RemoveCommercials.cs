@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Reflection.Metadata;
-using Extensions;
 using Whisper.net;
 using Whisper.net.Ggml;
 
 namespace SubtitleCreator
 {
+    /// <summary>
+    /// All the different Whisper models available
+    /// </summary>
     public enum ModelType { Tiny, Base, Small, Medium, Large }
 
     public class RemoveCommercials
@@ -18,7 +18,17 @@ namespace SubtitleCreator
         {
         }
 
-
+        /// <summary>
+        /// Generate the subtitles from the audio (wav) file
+        /// </summary>
+        /// <param name="wavFilePath"></param>
+        /// <param name="modelType"></param>
+        /// <param name="appDataDir"></param>
+        /// <param name="srtFile"></param>
+        /// <param name="languageCode"></param>
+        /// <param name="shouldTranslate"></param>
+        /// <param name="audioLanguage"></param>
+        /// <returns></returns>
         public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string appDataDir, string srtFile, string languageCode, bool shouldTranslate, string audioLanguage)
         {
             List<SegmentData> segments = new();
@@ -70,19 +80,11 @@ namespace SubtitleCreator
 
             void OnNewSegment(SegmentData segmentData)
             {
-                var startTime = Utilities.ConvertTimestampToSrtFormat(segmentData.Start);
-                var endTime = Utilities.ConvertTimestampToSrtFormat(segmentData.End);
+                var startTime = Utilities.ConvertTimespanToSrtFormat(segmentData.Start);
+                var endTime = Utilities.ConvertTimespanToSrtFormat(segmentData.End);
              //   Utilities.ConsoleWithLog($"CSSS {startTime} ==> {endTime} : {segmentData.Text}");
                 segments.Add(segmentData);
             }
-
-            
-
-            //var audioData = File.ReadAllBytes(wavFilePath);
-            //var mel = model.AudioToMel(audioData);
-            //var (language, probs) = model.DetectLanguage(mel);
-
-            //Console.WriteLine($"Detected language: {language}
 
             using (Stream fileStream = File.OpenRead(wavFilePath))
             {
@@ -133,8 +135,8 @@ namespace SubtitleCreator
                 var subtitleIndex = 0;
                 foreach (var segment in segments)
                 {
-                    var startTime = Utilities.ConvertTimestampToSrtFormat(segment.Start);
-                    var endTime = Utilities.ConvertTimestampToSrtFormat(segment.End);
+                    var startTime = Utilities.ConvertTimespanToSrtFormat(segment.Start);
+                    var endTime = Utilities.ConvertTimespanToSrtFormat(segment.End);
                     if (startTime == endTime || segment.Text.Trim().Length == 0)
                         continue;
 
@@ -169,6 +171,11 @@ namespace SubtitleCreator
             return true;
         }
 
+        /// <summary>
+        /// Remove duplicate entries in the list of segments, keeping only the first one.
+        /// </summary>
+        /// <param name="segments"></param>
+        /// <returns></returns>
         private static List<SegmentData>? RemoveConsecutiveDuplicates(List<SegmentData> segments)
         {
             if (segments == null || segments.Count == 0)
@@ -188,6 +195,11 @@ namespace SubtitleCreator
             return result;
         }
 
+        /// <summary>
+        /// Remove duplicate entries in the list of segments, keeping only the last one.
+        /// </summary>
+        /// <param name="segments"></param>
+        /// <returns></returns>
         private static List<SegmentData>? RemoveConsecutiveDuplicatesKeepingLast(List<SegmentData> segments)
         {
             if (segments == null || segments.Count == 0)
@@ -209,7 +221,15 @@ namespace SubtitleCreator
             return result;
         }
 
-
+        /// <summary>
+        /// Create the Whisper processor
+        /// </summary>
+        /// <param name="modelPath"></param>
+        /// <param name="languageCode"></param>
+        /// <param name="shouldTranslate"></param>
+        /// <param name="audioLanguage"></param>
+        /// <param name="OnNewSegment"></param>
+        /// <returns></returns>
         private static WhisperProcessor? SetupProcessor(string modelPath, string languageCode, bool shouldTranslate, string audioLanguage, OnSegmentEventHandler OnNewSegment)
         {
             var whisperFactory = WhisperFactory.FromPath(modelPath);
@@ -243,6 +263,15 @@ namespace SubtitleCreator
             return builder.Build();
         }
 
+        /// <summary>
+        /// Merge the video file and the subtitles file into a MKV container
+        /// </summary>
+        /// <param name="srtFile"></param>
+        /// <param name="inFile"></param>
+        /// <param name="finalFile"></param>
+        /// <param name="ffmpegPath"></param>
+        /// <param name="audioLanguage"></param>
+        /// <returns></returns>
         public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath, string audioLanguage)
         {
             // set audio track to spanish, french, english
@@ -267,5 +296,4 @@ namespace SubtitleCreator
             return true;
         }
     }
- 
 }

@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Whisper.net.Ggml;
 
 namespace SubtitleCreator
@@ -17,14 +12,12 @@ namespace SubtitleCreator
         public static string Models = "Models";
         public static bool noLog = false;
 
-        public static void CreateFolder(string folderPath)
-        {
-            if (!Directory.Exists(folderPath))
-            {
-                Directory.CreateDirectory(folderPath);
-            }
-        }
 
+        /// <summary>
+        /// Convert from te enum to the actual Whisper model name
+        /// </summary>
+        /// <param name="modelType"></param>
+        /// <returns></returns>
         public static string GgmlTypeToString(GgmlType modelType)
         {
             var modelTypeString = modelType switch
@@ -45,16 +38,29 @@ namespace SubtitleCreator
 
             return $"ggml-{modelTypeString}.bin";
         }
-        public static string ConvertTimestampToSrtFormat(TimeSpan timestamp)
+
+        /// <summary>
+        /// Convert q timespan to what SRT files use
+        /// </summary>
+        /// <param name="timestamp"></param>
+        /// <returns></returns>
+        public static string ConvertTimespanToSrtFormat(TimeSpan timestamp)
         {
             return timestamp.ToString("hh\\:mm\\:ss\\,fff").Replace(".", ",");
         }
 
+        /// <summary>
+        /// Delete any existing log file
+        /// </summary>
         public static void CleanLog()
         {
             File.Delete($"{LogName}.log");
         }
 
+        /// <summary>
+        /// Write the supplied strong to the console and optionally to a log file
+        /// </summary>
+        /// <param name="text"></param>
         public static void ConsoleWithLog(string text)
         {
             Console.WriteLine(text);
