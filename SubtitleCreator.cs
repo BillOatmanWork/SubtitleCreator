@@ -112,6 +112,12 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog($"Audio Language: {audioLanguage}");
             Utilities.ConsoleWithLog($"Translate to English: {translate}");
 
+            if(File.Exists(inFile) == false)
+            {
+                Utilities.ConsoleWithLog($"Input file {inFile} does not exist. Exiting.");
+                return;
+            }
+
             if (merge == true)
                 Utilities.ConsoleWithLog($"Output File: {outputFile}");
             else
