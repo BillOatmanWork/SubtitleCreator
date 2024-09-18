@@ -60,63 +60,46 @@ namespace SubtitleCreator
             segments.Clear();
             if (!File.Exists(modelPath))
             {
-                //Utilities.ConsoleWithLog($"Downloading Whisper AI model {modelName}. This might take a while depending on your internet speed..");
-                //Utilities.ConsoleWithLog("The application might exit after downloading. Please restart the application manually in that case!");
-                // var modelStream = await WhisperGgmlDownloader.GetGgmlModelAsync(modelType);
-                var modelStream = WhisperGgmlDownloader.GetGgmlModelAsync(ggmlType).GetAwaiter().GetResult();
-                var fileWriter = File.OpenWrite(modelPath);
-                modelStream.CopyTo(fileWriter);
-                fileWriter.Close();
-                //Utilities.ConsoleWithLog("Downloaded model");
-            }
+                Utilities.ConsoleWithLog($"Downloading Whisper model {modelName}.");
+                try
+                {
+                    using (Stream modelStream = WhisperGgmlDownloader.GetGgmlModelAsync(ggmlType).GetAwaiter().GetResult())
+                    using (FileStream fileWriter = File.OpenWrite(modelPath))
+                    {
+                        modelStream.CopyTo(fileWriter);
+                    }
 
-            WhisperProcessor? processor = SetupProcessor(modelPath, languageCode, shouldTranslate, audioLanguage, OnNewSegment);
-
-            if (processor is null)
-            {
-                Utilities.ConsoleWithLog("Something went wrong while setting up the processor.");
-                return false;
+                    Utilities.ConsoleWithLog("Whisper model download complete.");
+                }
+                catch (Exception ex)
+                {
+                    Utilities.ConsoleWithLog($"Exception downloading model: {ex.Message}");
+                    return false;
+                }
             }
 
             void OnNewSegment(SegmentData segmentData)
             {
                 var startTime = Utilities.ConvertTimespanToSrtFormat(segmentData.Start);
                 var endTime = Utilities.ConvertTimespanToSrtFormat(segmentData.End);
-             //   Utilities.ConsoleWithLog($"CSSS {startTime} ==> {endTime} : {segmentData.Text}");
                 segments.Add(segmentData);
             }
 
-            using (Stream fileStream = File.OpenRead(wavFilePath))
+            using (WhisperProcessor? processor = SetupProcessor(modelPath, languageCode, shouldTranslate, audioLanguage, OnNewSegment))
             {
-                GC.KeepAlive(fileStream);
-                GC.KeepAlive(processor);
+                if (processor is null)
+                {
+                    Utilities.ConsoleWithLog("Something went wrong while setting up the Whisper processor.");
+                    return false;
+                }
 
-                // Read the file stream into a byte array
-                // *** Note:  Currently there is a bug in DetectLanguage
-                //byte[] audioData;
-                //using (MemoryStream ms = new MemoryStream())
-                //{
-                //    fileStream.CopyTo(ms);
-                //    audioData = ms.ToArray();
-                //}
+                using (Stream fileStream = File.OpenRead(wavFilePath))
+                {
+                    //GC.KeepAlive(fileStream);
+                    //GC.KeepAlive(processor);
 
-                //// Convert byte array to float array
-                //// Ensure audioData length is a multiple of 4
-                //int floatArrayLength = audioData.Length / sizeof(float);
-                //float[] floatData = new float[floatArrayLength / 4];
-                //Buffer.BlockCopy(audioData, 0, floatData, 0, (floatArrayLength / 4) * sizeof(float));
-
-                //var detectedLanguage = processor.DetectLanguage(floatData);
-
-                //if(detectedLanguage.Length > 0)
-                //{
-                //    Utilities.ConsoleWithLog($"Detected language: {detectedLanguage}");
-                //}
-
-                //fileStream.Seek(0, SeekOrigin.Begin);
-
-                processor.Process(fileStream);
-                processor.Dispose();
+                    processor.Process(fileStream);
+                }
             }
 
             // Sort segments by start time
@@ -279,19 +262,21 @@ namespace SubtitleCreator
             string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt -metadata:s:s:0 language=eng  -metadata:s:a:0 language={audioLanguage} \"{finalFile}\"";
 
             // Set up the process to run FFmpeg
-            Process ffmpeg = new Process();
-            ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
-            ffmpeg.StartInfo.Arguments = ffmpegArgs;
-            ffmpeg.StartInfo.RedirectStandardError = true;
-            ffmpeg.StartInfo.UseShellExecute = false;
-            ffmpeg.StartInfo.CreateNoWindow = true;
+            using (Process ffmpeg = new Process())
+            {
+                ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
+                ffmpeg.StartInfo.Arguments = ffmpegArgs;
+                ffmpeg.StartInfo.RedirectStandardError = true;
+                ffmpeg.StartInfo.UseShellExecute = false;
+                ffmpeg.StartInfo.CreateNoWindow = true;
 
-            // Start the process
-            ffmpeg.Start();
+                // Start the process
+                ffmpeg.Start();
 
-            // Read the output
-            string output = ffmpeg.StandardError.ReadToEnd();
-            ffmpeg.WaitForExit();
+                // Read the output
+                string output = ffmpeg.StandardError.ReadToEnd();
+                ffmpeg.WaitForExit();
+            }
 
             return true;
         }
