@@ -1,10 +1,11 @@
 # SubtitleCreator
 SubtitleCreator is a command line utility to generate subtitles for a video file and optionally put into a MKV container. It is written in C# with executables available for multiple operating systems.
-It uses [Whisper.NET](https://github.com/sandrohanea/whisper.net)
+It uses [Whisper.NET](https://github.com/sandrohanea/whisper.net) and [ffmpeg.org](https://ffmpeg.org) to generate the subtitles.
 
 ## Installation
 - Decompress the proper file for your operating system into a folder. 
 - Decompress the runtime file such that the end result is a runtime folder in the same folder as the SubtitleCreator executable.
+- The ffmpeg executable must be available on your system.  It can be downloaded from [ffmpeg.org](https://ffmpeg.org/download.html)
 
 ## Parameters (Case Insensitive)
 - -ffmpegpPath=Path to the ffmpeg executable.  Just the folder, the exe is assumed to be ffmpeg.exe.
