@@ -8,7 +8,7 @@ It uses [Whisper.NET](https://github.com/sandrohanea/whisper.net) and [ffmpeg](h
 - The ffmpeg executable must be available on your system.  It can be downloaded from [ffmpeg.org](https://ffmpeg.org/download.html)
 
 ## Parameters (Case Insensitive)
-- -ffmpegpPath=Path to the ffmpeg executable.  Just the folder, the exe is assumed to be ffmpeg.exe.
+- -ffmpegpPath=Path to the ffmpeg executable.  Just the folder, the exe is assumed to be ffmpeg.exe or ffmpeg.
 - -inFile=The video file the subtitles will be generated for.
 - Optional: -nomerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this parameter is used, the MKV container will not be created and the subtitle file will not be deleted.
 - Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.
