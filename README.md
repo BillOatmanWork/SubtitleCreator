@@ -19,7 +19,8 @@ It uses [Whisper.NET](https://github.com/sandrohanea/whisper.net)
 For the Emby software package (and I believe also for Jellyfin and Plex) you can specify a command to be executed after a recording has completed.  
 This is a windows batch file that will run SubtitleCreator to create an SRT subtitle file for the recording automatically in Emby.
 
-```set drive=%~d1
+```
+set drive=%~d1
 set folder=%~p1
 set filename=%~n1
 c:
