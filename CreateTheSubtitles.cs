@@ -12,9 +12,9 @@ namespace SubtitleCreator
     /// </summary>
     public enum ModelType { Tiny, Base, Small, Medium, Large }
 
-    public class RemoveCommercials
+    public class CreateTheSubtitles
     {
-        public RemoveCommercials()
+        public CreateTheSubtitles()
         {
         }
 

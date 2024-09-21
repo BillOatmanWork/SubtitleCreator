@@ -31,6 +31,7 @@ namespace SubtitleCreator
             string audioLanguage = "eng";
             bool merge = true;
             string outputFile = string.Empty;
+            bool attemptToRepair = true;
 
             bool paramsOK = true;
             foreach (string arg in args)
@@ -50,6 +51,12 @@ namespace SubtitleCreator
                 if (arg.ToLower() == "-nomerge")
                 {
                     merge = false;
+                    continue;
+                }
+
+                if (arg.ToLower() == "-norepair")
+                {
+                    attemptToRepair = false;
                     continue;
                 }
 
@@ -111,8 +118,9 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog($"Input File: {inFile}");
             Utilities.ConsoleWithLog($"Audio Language: {audioLanguage}");
             Utilities.ConsoleWithLog($"Translate to English: {translate}");
+            Utilities.ConsoleWithLog($"Attempt to Repair: {attemptToRepair}");
 
-            if(File.Exists(inFile) == false)
+            if (File.Exists(inFile) == false)
             {
                 Utilities.ConsoleWithLog($"Input file {inFile} does not exist. Exiting.");
                 return;
@@ -126,7 +134,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("");
 
             Utilities.ConsoleWithLog("Extracting audio from the video file ... ");
-            string audioFilePath = AudioExtractor.ExtractAudioFromVideoFile(inFile);
+            string audioFilePath = AudioExtractor.ExtractAudioFromVideoFile(inFile, attemptToRepair, ffmpegPath);
             if (string.IsNullOrEmpty(audioFilePath))
             {
                 Utilities.ConsoleWithLog("Audio extraction failed. Exiting.");
@@ -134,7 +142,7 @@ namespace SubtitleCreator
             }
             Utilities.ConsoleWithLog("Audio extraction complete.");
 
-            RemoveCommercials removeCommercials = new RemoveCommercials();
+            CreateTheSubtitles removeCommercials = new CreateTheSubtitles();
 
             ModelType modelType = ModelType.Medium;
             switch (model.ToLower())
@@ -181,11 +189,12 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("-ffmpegpPath=Path to the ffmpeg executable.  Just the folder, the exe is assumed to be ffmpeg.exe.");
             Utilities.ConsoleWithLog("-inFile=The video file the subtitles will be generated for.");
             Utilities.ConsoleWithLog("");
-            Utilities.ConsoleWithLog("Optional: -nomerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted. ");
+            Utilities.ConsoleWithLog("Optional: -noMerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted.");
             Utilities.ConsoleWithLog("Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.");
             Utilities.ConsoleWithLog("Optional: -audioLanguage=<language>  The Whisper audio language detection feature has problems now.  So this should be specified if the audio is not in english. Possible values are eng = English, fra = French, spa = spanish. English is the default.");
             Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is none.");
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
+            Utilities.ConsoleWithLog("Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.");
             Utilities.ConsoleWithLog("");
 
             string example = $"SubtitleCreator -ffmpegPath=\"Path\to\ffmpeg folder\" -inFile=\"c:\\My Movies\\My Little Pony.ts\" -Model=Large";
