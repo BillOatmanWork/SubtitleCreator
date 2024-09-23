@@ -15,6 +15,13 @@ namespace SubtitleCreator
         private static string fileNameIdentifier = "_!SubtitleCreator!";
         private static string outputFilePath = string.Empty;
 
+        /// <summary>
+        /// Enry point to extract the audio fromthe video file so Whisper can process it.
+        /// </summary>
+        /// <param name="videoFilePath"></param>
+        /// <param name="attemptRepair"></param>
+        /// <param name="ffmpegPath"></param>
+        /// <returns></returns>
         public static string ExtractAudioFromVideoFile(string videoFilePath, bool attemptRepair, string ffmpegPath)
         {
             outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath), $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
@@ -70,6 +77,10 @@ namespace SubtitleCreator
             return outputFilePath;
         }
 
+        /// <summary>
+        /// Perform the actual audio extraction.
+        /// </summary>
+        /// <param name="videoFilePath"></param>
         private static void ExtractTheAudio(string videoFilePath)
         {
             const int outRate = 16000;
@@ -85,6 +96,12 @@ namespace SubtitleCreator
             }
         }
 
+        /// <summary>
+        /// Attempt to repair the audio in the video file.  This is a last ditch effort to get the audio extracted.  If this fails, the audio extraction will fail.
+        /// </summary>
+        /// <param name="videoFilePath"></param>
+        /// <param name="ffmpegPath"></param>
+        /// <returns></returns>
         private static string RepairAudio(string videoFilePath, string ffmpegPath)
         {
             // repair audio ffmpeg" -i "NFL Fantasy Live 2024_09_20_18_00_00.ts" -c:v copy -c:a aac "NFL Fantasy Live 2024_09_20_18_00_00.mp4"
