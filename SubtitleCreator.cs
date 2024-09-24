@@ -1,5 +1,6 @@
 ﻿using Extensions;
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace SubtitleCreator
@@ -134,13 +135,14 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("");
 
             Utilities.ConsoleWithLog("Extracting audio from the video file ... ");
+            Watch.WatchStart();
             string audioFilePath = AudioExtractor.ExtractAudioFromVideoFile(inFile, attemptToRepair, ffmpegPath);
             if (string.IsNullOrEmpty(audioFilePath))
             {
                 Utilities.ConsoleWithLog("Audio extraction failed. Exiting.");
                 return;
             }
-            Utilities.ConsoleWithLog("Audio extraction complete.");
+            Utilities.ConsoleWithLog($"Audio extraction complete in {Watch.WatchStop()}.");
 
             CreateTheSubtitles removeCommercials = new CreateTheSubtitles();
 
@@ -159,14 +161,16 @@ namespace SubtitleCreator
             }
 
             Utilities.ConsoleWithLog("Creating subtitles file. Please be patient ... ");
+            Watch.WatchStart();
             bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, audioLanguage);
-            Utilities.ConsoleWithLog("Subtitle creation complete.");
+            Utilities.ConsoleWithLog($"Subtitle creation complete in {Watch.WatchStop()}.");
 
             if(merge == true)
             {
                 Utilities.ConsoleWithLog("Merge process started.");
+                Watch.WatchStart();
                 removeCommercials.DoWorkMergeSubtitles(srtFile, inFile, outputFile, ffmpegPath, audioLanguage);
-                Utilities.ConsoleWithLog($"Merge process completed. Merged file {outputFile} created.");
+                Utilities.ConsoleWithLog($"Merge process completed in {Watch.WatchStop()}. Merged file {outputFile} created.");
                 File.Delete(srtFile);
             }
             else
