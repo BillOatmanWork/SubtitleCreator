@@ -30,5 +30,8 @@ cd\SubtitleCreator
 SubtitleCreator -ffmpegpath="C:\ffmpeg\bin" -infile="%drive%%folder%%filename%.ts" -model=medium -nomerge
 ```
 
+## Note
+Based on my testing, using the medium model does a great job.  However, depending upon the strength of your machine running this app, it can take quite a while to generate the subtitles.  My box is several years old and by no means a supercomputer but not a boat anchor either, a recording that was 66 minutes in length took 60 minutes to generate the SRT file.  
+
 ## Thanks to
 - [@trananh1992](https://github.com/trananh1992/WinWhisper-SRT) for creating the WinWhisper-SRT project.
