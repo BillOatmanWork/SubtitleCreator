@@ -24,7 +24,7 @@ namespace SubtitleCreator
         /// <returns></returns>
         public static string ExtractAudioFromVideoFile(string videoFilePath, bool attemptRepair, string ffmpegPath)
         {
-            outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath), $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
+            outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
 
             try
             {
@@ -105,7 +105,7 @@ namespace SubtitleCreator
         private static string RepairAudio(string videoFilePath, string ffmpegPath)
         {
             // repair audio ffmpeg" -i "NFL Fantasy Live 2024_09_20_18_00_00.ts" -c:v copy -c:a aac "NFL Fantasy Live 2024_09_20_18_00_00.mp4"
-            string intermediateFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath), $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.mp4");
+            string intermediateFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.mp4");
             string ffmpegArgs = $"-i \"{videoFilePath}\" -c:v copy -c:a aac \"{intermediateFilePath}\"";
 
             // Set up the process to run FFmpeg

@@ -105,18 +105,16 @@ namespace SubtitleCreator
             // Sort segments by start time
             segments.Sort((x, y) => x.Start.CompareTo(y.Start));
 
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
             // Remove all consecutive segments that have the same Text content.  For some reason it happens with some models.
             // segments = RemoveConsecutiveDuplicates(segments);
-            segments = RemoveConsecutiveDuplicatesKeepingLast(segments);
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+            segments = RemoveConsecutiveDuplicatesKeepingLast(segments) ?? new List<SegmentData>();
 
             var outputLanguagecode = languageCode.Length == 0 || shouldTranslate ? "en" : languageCode;
 
             using (StreamWriter writer = new StreamWriter(srtFile))
             {
                 var subtitleIndex = 0;
-                foreach (var segment in segments)
+                foreach (var segment in segments ?? new List<SegmentData>())
                 {
                     var startTime = Utilities.ConvertTimespanToSrtFormat(segment.Start);
                     var endTime = Utilities.ConvertTimespanToSrtFormat(segment.End);

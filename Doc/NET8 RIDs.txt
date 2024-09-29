@@ -1,0 +1,5 @@
+
+Valid RIDs for NET8
+
+https://learn.microsoft.com/en-us/dotnet/core/rid-catalog
+
