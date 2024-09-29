@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Build/runtimes.7z
+/Build/runtimes.zip
+/Build/SubtitleCreator-LIN64.7z
+*.7z
+*.zip
