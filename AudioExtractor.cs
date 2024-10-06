@@ -24,6 +24,9 @@ namespace SubtitleCreator
         /// <returns></returns>
         public static string ExtractAudioFromVideoFile(string videoFilePath, bool attemptRepair, string ffmpegPath)
         {
+            // check for mkv input file and use ffmpeg to convert to mp4  ffmpeg -i input.mkv -c copy -map 0:v output_video.mp4
+
+
             outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
 
             try
