@@ -24,14 +24,20 @@ namespace SubtitleCreator
         /// <returns></returns>
         public static string ExtractAudioFromVideoFile(string videoFilePath, bool attemptRepair, string ffmpegPath)
         {
-            // check for mkv input file and use ffmpeg to convert to mp4  ffmpeg -i input.mkv -c copy -map 0:v output_video.mp4
+            string newVideoFilePath = videoFilePath;
 
+            if (Path.GetExtension(videoFilePath).ToLower() == ".mkv")
+            {
+                Utilities.ConsoleWithLog("Input file is in a MKV container.  Extracting the video.");
+
+                newVideoFilePath = ExtractVideoFromMKV(videoFilePath, ffmpegPath);
+            }
 
             outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
 
             try
             {
-                ExtractTheAudio(videoFilePath);
+                ExtractTheAudio(newVideoFilePath);
             }
             catch (Exception ex)
             {
@@ -110,6 +116,32 @@ namespace SubtitleCreator
             // repair audio ffmpeg" -i "NFL Fantasy Live 2024_09_20_18_00_00.ts" -c:v copy -c:a aac "NFL Fantasy Live 2024_09_20_18_00_00.mp4"
             string intermediateFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.mp4");
             string ffmpegArgs = $"-i \"{videoFilePath}\" -c:v copy -c:a aac \"{intermediateFilePath}\"";
+
+            // Set up the process to run FFmpeg
+            using (Process ffmpeg = new Process())
+            {
+                ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
+                ffmpeg.StartInfo.Arguments = ffmpegArgs;
+                ffmpeg.StartInfo.RedirectStandardError = true;
+                ffmpeg.StartInfo.UseShellExecute = false;
+                ffmpeg.StartInfo.CreateNoWindow = true;
+
+                // Start the process
+                ffmpeg.Start();
+
+                // Read the output
+                string output = ffmpeg.StandardError.ReadToEnd();
+                ffmpeg.WaitForExit();
+            }
+
+            return intermediateFilePath;
+        }
+
+        private static string ExtractVideoFromMKV(string videoFilePath, string ffmpegPath)
+        {
+            // check for mkv input file and use ffmpeg to convert to mp4  ffmpeg -i input.mkv -c copy -map 0:v output_video.mp4
+            string intermediateFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.mp4");
+            string ffmpegArgs = $"-i \"{videoFilePath}\" -c copy -map 0:v \"{intermediateFilePath}\"";
 
             // Set up the process to run FFmpeg
             using (Process ffmpeg = new Process())
