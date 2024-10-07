@@ -2,7 +2,7 @@
   "profiles": {
     "SubtitleCreator": {
       "commandName": "Project",
-      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg-2024-08-15-git-1f801dfdb5-full_build\\bin\" -infile=\"C:\\TestData\\Last Man Standing S01E03.ts\" -model=medium"
+      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg-2024-08-15-git-1f801dfdb5-full_build\\bin\" -infile=\"C:\\TestData\\Wheel of Fortune S40E93.mkv\" -model=medium"
     }
   }
 }

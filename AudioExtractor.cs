@@ -25,12 +25,17 @@ namespace SubtitleCreator
         public static string ExtractAudioFromVideoFile(string videoFilePath, bool attemptRepair, string ffmpegPath)
         {
             string newVideoFilePath = videoFilePath;
+            bool tempFileCreated = false;
 
             if (Path.GetExtension(videoFilePath).ToLower() == ".mkv")
             {
                 Utilities.ConsoleWithLog("Input file is in a MKV container.  Extracting the video.");
 
                 newVideoFilePath = ExtractVideoFromMKV(videoFilePath, ffmpegPath);
+
+                Utilities.ConsoleWithLog("The video file has been extracted.  Now let's get back to extracting its audio.");
+
+                tempFileCreated = true;
             }
 
             outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
@@ -82,7 +87,10 @@ namespace SubtitleCreator
                     }
                 }
             }
-          
+
+            if (tempFileCreated == true)
+                File.Delete(newVideoFilePath);
+
             return outputFilePath;
         }
 
@@ -139,9 +147,9 @@ namespace SubtitleCreator
 
         private static string ExtractVideoFromMKV(string videoFilePath, string ffmpegPath)
         {
-            // check for mkv input file and use ffmpeg to convert to mp4  ffmpeg -i input.mkv -c copy -map 0:v output_video.mp4
+            // check for mkv input file and use ffmpeg to convert to mp4  ffmpeg -i input.mkv -c copy -map 0:v -map 0:a output_video.mp4
             string intermediateFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.mp4");
-            string ffmpegArgs = $"-i \"{videoFilePath}\" -c copy -map 0:v \"{intermediateFilePath}\"";
+            string ffmpegArgs = $"-i \"{videoFilePath}\" -c copy -map 0:v -map 0:a \"{intermediateFilePath}\"";
 
             // Set up the process to run FFmpeg
             using (Process ffmpeg = new Process())

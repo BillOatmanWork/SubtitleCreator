@@ -1,5 +1,0 @@
-
-If removal of all tags is desired, user needs to install mkvtoolnix and supply path to the bin folder.  And add the following command ot the code.
-"C:\Program Files\MKVToolNix\mkvpropedit" "C:\TestData\Wheel of Fortune S40E93_final_subs.mkv" --tags all:
-
-
