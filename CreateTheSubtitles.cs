@@ -29,7 +29,7 @@ namespace SubtitleCreator
         /// <param name="shouldTranslate"></param>
         /// <param name="audioLanguage"></param>
         /// <returns></returns>
-        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string workingDir, string srtFile, string languageCode, bool shouldTranslate, string audioLanguage)
+        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string workingDir, string srtFile, string languageCode, bool shouldTranslate, bool useSDH, string audioLanguage)
         {
             List<SegmentData> segments = new();
 
@@ -85,7 +85,7 @@ namespace SubtitleCreator
                 segments.Add(segmentData);
             }
 
-            using (WhisperProcessor? processor = SetupProcessor(modelPath, languageCode, shouldTranslate, audioLanguage, OnNewSegment))
+            using (WhisperProcessor? processor = SetupProcessor(modelPath, languageCode, shouldTranslate, audioLanguage, useSDH, OnNewSegment))
             {
                 if (processor is null)
                 {
@@ -211,12 +211,19 @@ namespace SubtitleCreator
         /// <param name="audioLanguage"></param>
         /// <param name="OnNewSegment"></param>
         /// <returns></returns>
-        private static WhisperProcessor? SetupProcessor(string modelPath, string languageCode, bool shouldTranslate, string audioLanguage, OnSegmentEventHandler OnNewSegment)
+        private static WhisperProcessor? SetupProcessor(string modelPath, string languageCode, bool shouldTranslate, string audioLanguage, bool useSDH, OnSegmentEventHandler OnNewSegment)
         {
             var whisperFactory = WhisperFactory.FromPath(modelPath);
 
             var builder = whisperFactory.CreateBuilder()
-                .WithSegmentEventHandler(OnNewSegment);
+                .WithSegmentEventHandler((segment) =>
+                {
+                    // Skip lines with parentheses if useSDH is false
+                    if (useSDH || (!segment.Text.Contains('(') && !segment.Text.Contains(')')))
+                    {
+                        OnNewSegment(segment);
+                    }
+                });
 
             if (languageCode.Length > 0)
                 builder.WithLanguage(languageCode);

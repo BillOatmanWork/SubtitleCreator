@@ -31,6 +31,7 @@ namespace SubtitleCreator
             string language = "en";
             string audioLanguage = "eng";
             bool merge = true;
+            bool useSDH = false;
             string outputFile = string.Empty;
             bool attemptToRepair = true;
 
@@ -52,6 +53,12 @@ namespace SubtitleCreator
                 if (arg.ToLower() == "-nomerge")
                 {
                     merge = false;
+                    continue;
+                }
+
+                if (arg.ToLower() == "-nosdh")
+                {
+                    useSDH = false;
                     continue;
                 }
 
@@ -120,6 +127,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog($"Audio Language: {audioLanguage}");
             Utilities.ConsoleWithLog($"Translate to English: {translate}");
             Utilities.ConsoleWithLog($"Attempt to Repair: {attemptToRepair}");
+            Utilities.ConsoleWithLog($"Create SDH Subtitles: {useSDH}");
 
             if (File.Exists(inFile) == false)
             {
@@ -162,7 +170,7 @@ namespace SubtitleCreator
 
             Utilities.ConsoleWithLog("Creating subtitles file. Please be patient ... ");
             Watch.WatchStart();
-            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, audioLanguage);
+            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, useSDH, audioLanguage);
             Utilities.ConsoleWithLog($"Subtitle creation complete in {Watch.WatchStop()}.");
 
             if(merge == true)
@@ -199,6 +207,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is none.");
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
             Utilities.ConsoleWithLog("Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.");
+            Utilities.ConsoleWithLog("Optional: -noSDH  Do not generate descriptive lines such as {grunting).  By default, the descriptive (SDH) subtitles will be included.");
             Utilities.ConsoleWithLog("");
 
             string example = $"SubtitleCreator -ffmpegPath=\"Path\to\ffmpeg folder\" -inFile=\"c:\\My Movies\\My Little Pony.ts\" -Model=Large";
