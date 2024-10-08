@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /Build/SubtitleCreator-LIN64.7z
 *.7z
 *.zip
+/Build
