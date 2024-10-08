@@ -31,7 +31,7 @@ namespace SubtitleCreator
             string language = "en";
             string audioLanguage = "eng";
             bool merge = true;
-            bool useSDH = false;
+            bool useSDH = true;
             string outputFile = string.Empty;
             bool attemptToRepair = true;
 

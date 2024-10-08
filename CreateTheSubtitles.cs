@@ -218,8 +218,7 @@ namespace SubtitleCreator
             var builder = whisperFactory.CreateBuilder()
                 .WithSegmentEventHandler((segment) =>
                 {
-                    // Skip lines with parentheses if useSDH is false
-                    if (useSDH || (!segment.Text.Contains('(') && !segment.Text.Contains(')')))
+                    if (useSDH || !segment.Text.Contains("♪ ♪") && (!segment.Text.Contains('(') && !segment.Text.Contains(')')) && (!segment.Text.Contains('[') && !segment.Text.Contains(']')))
                     {
                         OnNewSegment(segment);
                     }
