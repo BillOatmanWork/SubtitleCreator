@@ -16,6 +16,7 @@ It uses [Whisper.NET](https://github.com/sandrohanea/whisper.net) and [ffmpeg](h
 - Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is none.
 - Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.
 - Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.
+- Optional: -noSDH Do not generate descriptive lines such as [grunting]. By default, the descriptive (SDH) subtitles will be included.
   
 ## Example
 For the Emby software package (and I believe also for Jellyfin and Plex) you can specify a command to be executed after a recording has completed.  
