@@ -207,7 +207,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is none.");
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
             Utilities.ConsoleWithLog("Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.");
-            Utilities.ConsoleWithLog("Optional: -noSDH  Do not generate descriptive lines such as {grunting).  By default, the descriptive (SDH) subtitles will be included.");
+            Utilities.ConsoleWithLog("Optional: -noSDH  Do not generate descriptive lines such as [grunting].  By default, the descriptive (SDH) subtitles will be included.");
             Utilities.ConsoleWithLog("");
 
             string example = $"SubtitleCreator -ffmpegPath=\"Path\to\ffmpeg folder\" -inFile=\"c:\\My Movies\\My Little Pony.ts\" -Model=Large";
