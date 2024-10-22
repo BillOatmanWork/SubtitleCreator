@@ -122,9 +122,29 @@ namespace SubtitleCreator
             string fNameLang = string.IsNullOrEmpty(language) ? "" : language;
             string srtFile = $"{inFile.FullFileNameWithoutExtention()}.{fNameLang}.srt";
 
+            string audioLanguageLong = string.Empty;
+            switch(audioLanguage)
+            {
+                case "en":
+                    audioLanguageLong = "English";
+                    break;
+
+                case "spa":
+                    audioLanguageLong = "Spanish";
+                    break;
+
+                case "fra":
+                    audioLanguageLong = "French";
+                    break;
+
+                case "jap":
+                    audioLanguageLong = "Japanese";
+                    break;
+            }
+
             Utilities.ConsoleWithLog($"ffmpeg Path: {ffmpegPath}");
             Utilities.ConsoleWithLog($"Input File: {inFile}");
-            Utilities.ConsoleWithLog($"Audio Language: {audioLanguage}");
+            Utilities.ConsoleWithLog($"Audio Language: {audioLanguageLong}");
             Utilities.ConsoleWithLog($"Translate to English: {translate}");
             Utilities.ConsoleWithLog($"Attempt to Repair: {attemptToRepair}");
             Utilities.ConsoleWithLog($"Create SDH Subtitles: {useSDH}");
@@ -204,7 +224,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("Optional: -noMerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted.");
             Utilities.ConsoleWithLog("Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.");
             Utilities.ConsoleWithLog("Optional: -audioLanguage=<language>  The Whisper audio language detection feature has problems now.  So this should be specified if the audio is not in english. Possible values are eng = English, fra = French, spa = Spanish, jap = Japanese. English is the default.");
-            Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is none.");
+            Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is en.");
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
             Utilities.ConsoleWithLog("Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.");
             Utilities.ConsoleWithLog("Optional: -noSDH  Do not generate descriptive lines such as [grunting].  By default, the descriptive (SDH) subtitles will be included.");
