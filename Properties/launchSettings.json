@@ -2,7 +2,7 @@
   "profiles": {
     "SubtitleCreator": {
       "commandName": "Project",
-      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg-2024-08-15-git-1f801dfdb5-full_build\\bin\" -infile=\"C:\\TestData\\Wheel of Fortune S40E93.ts\" -model=medium -audiolanguage=jap -translate"
+      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg-2024-08-15-git-1f801dfdb5-full_build\\bin\" -infile=\"C:\\TestData\\Wheel of Fortune S40E93.ts\" -model=medium -audiolanguage=jpn -translate"
     }
   }
 }

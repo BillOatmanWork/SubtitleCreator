@@ -1,5 +1,6 @@
 ﻿using Extensions;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
@@ -44,6 +45,16 @@ namespace SubtitleCreator
                     return;
                 }
 
+                if (arg.ToLower() == "-languagelist")
+                {
+                    List<string> langList = WhisperLanguageMapper.ListAllLanguages();
+                    Utilities.ConsoleWithLog("Possible audio languages are:");
+                    foreach (string lang in langList)
+                        Utilities.ConsoleWithLog(lang);
+
+                    return;
+                }
+
                 if (arg.ToLower() == "-translate")
                 {
                     translate = true;
@@ -84,10 +95,10 @@ namespace SubtitleCreator
 
                     case "-audiolanguage":
                         audioLanguage = arg.Substring(arg.IndexOf('=') + 1).Trim().ToLower();
-                        if (audioLanguage != "eng" && audioLanguage != "fra" && audioLanguage != "spa" && audioLanguage != "jap")
+                        if(string.IsNullOrEmpty(WhisperLanguageMapper.GetWhisperCode(audioLanguage)))
                         {
                             paramsOK = false;
-                            Utilities.ConsoleWithLog($"Invalid audio language: {audioLanguage}. Possible values are eng = English, fra = French, spa = Spanish, jap = Japanese. English is the default.");
+                            Utilities.ConsoleWithLog($"Invalid audio language: {audioLanguage}. For a list of possible languages, run SubtitleCreator -LanguageList. English is the default.");
                         }
                         break;
 
@@ -223,7 +234,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("");
             Utilities.ConsoleWithLog("Optional: -noMerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted.");
             Utilities.ConsoleWithLog("Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.");
-            Utilities.ConsoleWithLog("Optional: -audioLanguage=<language>  The Whisper audio language detection feature has problems now.  So this should be specified if the audio is not in english. Possible values are eng = English, fra = French, spa = Spanish, jap = Japanese. English is the default.");
+            Utilities.ConsoleWithLog("Optional: -audioLanguage=<language>  The Whisper audio language detection feature has problems now.  So this should be specified if the audio is not in english. English is the default.");
             Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is en.");
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
             Utilities.ConsoleWithLog("Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.");
@@ -231,7 +242,10 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("");
 
             string example = $"SubtitleCreator -ffmpegPath=\"Path\to\ffmpeg folder\" -inFile=\"c:\\My Movies\\My Little Pony.ts\" -Model=Large";
+            Utilities.ConsoleWithLog(example);
+            Utilities.ConsoleWithLog("");
 
+            Utilities.ConsoleWithLog("For a list of possible audioLanguages, run SubtitleCreator -LanguageList.");
             Utilities.ConsoleWithLog("");
 
             Utilities.ConsoleWithLog("Hit enter to continue");

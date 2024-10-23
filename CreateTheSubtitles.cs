@@ -230,23 +230,8 @@ namespace SubtitleCreator
                 builder.WithLanguageDetection();
 
             if (shouldTranslate)
-            { 
-                switch(audioLanguage)
-                {
-                    case "eng":
-                        builder.WithLanguage("en");
-                        break;
-                    case "fra":
-                        builder.WithLanguage("fr");
-                        break;
-                    case "spa":
-                        builder.WithLanguage("es");
-                        break;
-                    case "jap":
-                        builder.WithLanguage("ja");
-                        break;
-                }
-
+            {
+                builder.WithLanguage(WhisperLanguageMapper.GetWhisperCode(audioLanguage));
                 builder.WithTranslate();
             }
 
@@ -264,11 +249,7 @@ namespace SubtitleCreator
         /// <returns></returns>
         public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath, string audioLanguage)
         {
-            // set audio track to spanish, french, english, japanese
-            // -metadata:s:a:0 language=spa    fra   eng  ja
-            if (audioLanguage == "jap")
-                audioLanguage = "ja";
-
+            // Set audio track to correct language
             string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt -metadata:s:s:0 language=eng  -metadata:s:a:0 language={audioLanguage} \"{finalFile}\"";
 
             // Set up the process to run FFmpeg
