@@ -22,9 +22,6 @@ It uses [Whisper.NET](https://github.com/sandrohanea/whisper.net) and [ffmpeg](h
 For the Emby software package (and I believe also for Jellyfin and Plex) you can specify a command to be executed after a recording has completed.  
 This is a windows batch file that will run SubtitleCreator to create an SRT subtitle file for the recording automatically in Emby.
 
-## List of supported languages for translation to English
-For a list of possible audioLanguages, run SubtitleCreator -LanguageList.
-
 ```
 set drive=%~d1
 set folder=%~p1
@@ -33,6 +30,9 @@ c:
 cd\SubtitleCreator
 SubtitleCreator -ffmpegpath="C:\ffmpeg\bin" -infile="%drive%%folder%%filename%.ts" -model=medium -nomerge
 ```
+
+## List of supported languages for translation to English
+For a list of possible audioLanguages, run SubtitleCreator -LanguageList.
 
 ## Note
 Based on my testing, using the medium model does a great job.  However, depending upon the strength of your machine running this app, it can take quite a while to generate the subtitles.  My box is several years old and by no means a supercomputer but not a boat anchor either, a recording that was 66 minutes in length took 60 minutes to generate the SRT file.  
