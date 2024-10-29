@@ -213,6 +213,12 @@ namespace SubtitleCreator
         /// <returns></returns>
         private static WhisperProcessor? SetupProcessor(string modelPath, string languageCode, bool shouldTranslate, string audioLanguage, bool useSDH, OnSegmentEventHandler OnNewSegment)
         {
+            // Optional logging from the native library
+            //LogProvider.Instance.OnLog += (level, message) =>
+            //{
+            //    Utilities.ConsoleWithLog($"{level}: {message}");
+            //};
+
             var whisperFactory = WhisperFactory.FromPath(modelPath);
 
             var builder = whisperFactory.CreateBuilder()

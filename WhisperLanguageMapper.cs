@@ -97,5 +97,17 @@ namespace SubtitleCreator
 
             return string.Empty;
         }
+
+        public static string GetLanguageFullName(string code)
+        {
+            if (LanguageMap.TryGetValue(code, out var languageInfo))
+            {
+                return languageInfo.FullName;
+            }
+            else
+            {
+                return "Unknown language code";
+            }
+        }
     }
 }

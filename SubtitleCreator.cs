@@ -133,25 +133,7 @@ namespace SubtitleCreator
             string fNameLang = string.IsNullOrEmpty(language) ? "" : language;
             string srtFile = $"{inFile.FullFileNameWithoutExtention()}.{fNameLang}.srt";
 
-            string audioLanguageLong = string.Empty;
-            switch(audioLanguage)
-            {
-                case "en":
-                    audioLanguageLong = "English";
-                    break;
-
-                case "spa":
-                    audioLanguageLong = "Spanish";
-                    break;
-
-                case "fra":
-                    audioLanguageLong = "French";
-                    break;
-
-                case "jap":
-                    audioLanguageLong = "Japanese";
-                    break;
-            }
+            string audioLanguageLong = WhisperLanguageMapper.GetLanguageFullName(audioLanguage);
 
             Utilities.ConsoleWithLog($"ffmpeg Path: {ffmpegPath}");
             Utilities.ConsoleWithLog($"Input File: {inFile}");
