@@ -1,4 +1,8 @@
-﻿using System;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
+using System.Globalization;
 using System.IO;
 using Whisper.net.Ggml;
 
@@ -10,8 +14,7 @@ namespace SubtitleCreator
         public static string SubtitlesFolder = "Subtitles";
         public static string WavFolder = "RawAudio";
         public static string Models = "Models";
-        public static bool noLog = false;
-
+        public static bool noLog;
 
         /// <summary>
         /// Convert from te enum to the actual Whisper model name
@@ -46,7 +49,7 @@ namespace SubtitleCreator
         /// <returns></returns>
         public static string ConvertTimespanToSrtFormat(TimeSpan timestamp)
         {
-            return timestamp.ToString("hh\\:mm\\:ss\\,fff").Replace(".", ",");
+            return timestamp.ToString("hh\\:mm\\:ss\\,fff", CultureInfo.InvariantCulture).Replace(".", ",");
         }
 
         /// <summary>

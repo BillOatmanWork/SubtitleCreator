@@ -1,4 +1,7 @@
-﻿using System;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -150,30 +153,6 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("Subtitle Generation Complete.");
 
             return true;
-        }
-
-        /// <summary>
-        /// Remove duplicate entries in the list of segments, keeping only the first one.
-        /// </summary>
-        /// <param name="segments"></param>
-        /// <returns></returns>
-        private static List<SegmentData>? RemoveConsecutiveDuplicates(List<SegmentData> segments)
-        {
-            if (segments == null || segments.Count == 0)
-                return segments;
-
-            List<SegmentData> result = new List<SegmentData>();
-            SegmentData? previous = null;
-
-            foreach (var segment in segments)
-            {
-                if (previous == null || segment.Text != previous.Text)
-                    result.Add(segment);
-
-                previous = segment;
-            }
-
-            return result;
         }
 
         /// <summary>

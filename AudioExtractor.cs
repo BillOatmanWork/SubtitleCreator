@@ -1,9 +1,10 @@
-﻿
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
-using NAudio.Wave;
 using System;
 using System.Diagnostics;
 using System.IO;
+using NAudio.Wave;
 
 namespace SubtitleCreator
 {
@@ -12,7 +13,7 @@ namespace SubtitleCreator
     /// </summary>
     public static class AudioExtractor
     {
-        private static string fileNameIdentifier = "_!SubtitleCreator!";
+        private const string fileNameIdentifier = "_!SubtitleCreator!";
         private static string outputFilePath = string.Empty;
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace SubtitleCreator
             }
             catch (Exception ex)
             {
-                if(!ex.Message.ToLower().Contains("media type is invalid"))
+                if (!ex.Message.ToLower().Contains("media type is invalid"))
                 {
                     Utilities.ConsoleWithLog($"Unrecoverable exception extracting audio from the video file. {ex.Message}");
                     Utilities.ConsoleWithLog("Not attempting to repair.");
@@ -70,7 +71,7 @@ namespace SubtitleCreator
                 {
                     Utilities.ConsoleWithLog($"Exception extracting audio from the video file.  {ex.Message}");
                     Utilities.ConsoleWithLog("Attempting to repair.");
-                    
+
                     string repairedFile = RepairAudio(videoFilePath, ffmpegPath);
                     try
                     {

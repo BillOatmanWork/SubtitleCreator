@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using System;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Globalization;
 
 namespace SubtitleCreator
 {
@@ -12,7 +12,7 @@ namespace SubtitleCreator
     /// </summary>
     public static class Watch
     {
-        private static Stopwatch stopwatch = new Stopwatch();
+        private static readonly Stopwatch stopwatch = new Stopwatch();
 
         /// <summary>
         /// Start the watch.  Always resets back to zero.
@@ -22,6 +22,8 @@ namespace SubtitleCreator
             stopwatch.Restart();
         }
 
+        // ... other code ...
+
         /// <summary>
         /// Stop the watch and return a elapsed time string.
         /// </summary>
@@ -30,7 +32,7 @@ namespace SubtitleCreator
         {
             stopwatch.Stop();
             TimeSpan elapsed = stopwatch.Elapsed;
-            return string.Format("{0:00}:{1:00}:{2:00}.{3:00}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds, elapsed.Milliseconds / 10);
+            return string.Format(CultureInfo.InvariantCulture, "{0:00}:{1:00}:{2:00}.{3:00}", elapsed.Hours, elapsed.Minutes, elapsed.Seconds, elapsed.Milliseconds / 10);
         }
     }
 }

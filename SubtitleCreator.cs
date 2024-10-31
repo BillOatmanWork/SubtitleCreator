@@ -1,14 +1,16 @@
-﻿using Extensions;
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using Extensions;
 
 namespace SubtitleCreator
 {
-    class SubtitleCreator
+    sealed class SubtitleCreator
     {
-        
+
         public string workingDir = AppContext.BaseDirectory;
 
         static void Main(string[] args)
@@ -26,7 +28,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("");
 
             string ffmpegPath = string.Empty;
-            string inFile = string.Empty;            
+            string inFile = string.Empty;
             string model = "medium";
             bool translate = false;
             string language = "en";
@@ -95,7 +97,7 @@ namespace SubtitleCreator
 
                     case "-audiolanguage":
                         audioLanguage = arg.Substring(arg.IndexOf('=') + 1).Trim().ToLower();
-                        if(string.IsNullOrEmpty(WhisperLanguageMapper.GetWhisperCode(audioLanguage)))
+                        if (string.IsNullOrEmpty(WhisperLanguageMapper.GetWhisperCode(audioLanguage)))
                         {
                             paramsOK = false;
                             Utilities.ConsoleWithLog($"Invalid audio language: {audioLanguage}. For a list of possible languages, run SubtitleCreator -LanguageList. English is the default.");
@@ -183,10 +185,10 @@ namespace SubtitleCreator
 
             Utilities.ConsoleWithLog("Creating subtitles file. Please be patient ... ");
             Watch.WatchStart();
-            bool subsCreated = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, useSDH, audioLanguage);
+            _ = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, useSDH, audioLanguage);
             Utilities.ConsoleWithLog($"Subtitle creation complete in {Watch.WatchStop()}.");
 
-            if(merge == true)
+            if (merge == true)
             {
                 Utilities.ConsoleWithLog("Merge process started.");
                 Watch.WatchStart();
@@ -205,7 +207,7 @@ namespace SubtitleCreator
         /// <summary>
         /// Display help text
         /// </summary>
-        public void DisplayHelp()
+        public static void DisplayHelp()
         {
             Utilities.ConsoleWithLog("");
             Utilities.ConsoleWithLog("SubtitleCreator is a command line utility to generate subtitles for a video file and optionally put into a MKV container.");
