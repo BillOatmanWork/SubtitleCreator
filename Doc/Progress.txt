@@ -1,0 +1,55 @@
+using Whisper;
+using System;
+using System.IO;
+using NAudio.Wave;
+
+public class Program
+{
+    public static event EventHandler<ProgressEventArgs> ProgressChanged;
+
+    private static double totalDuration;
+
+    public static void Main(string[] args)
+    {
+        // Load Whisper model
+        var whisperFactory = WhisperFactory.FromPath("ggml-base.bin");
+        var processor = whisperFactory.CreateBuilder()
+            .WithSegmentEventHandler(OnNewSegment)
+            .WithFileModel("ggml-base.bin")
+            .WithTranslate()
+            .WithLanguage("auto")
+            .Build();
+
+        // Open the audio file
+        string audioFilePath = "yourAudio.wav";
+        totalDuration = GetAudioDuration(audioFilePath);
+
+        // Subscribe to progress updates
+        ProgressChanged += OnProgressChanged;
+
+        // Process the audio file
+        using var fileStream = File.OpenRead(audioFilePath);
+        processor.Process();
+    }
+
+    // Get the total duration of the audio file using NAudio
+    private static double GetAudioDuration(string filePath)
+    {
+        using var reader = new AudioFileReader(filePath);
+        return reader.TotalTime.TotalSeconds;
+    }
+
+    // Event handler for new segments
+    private static void OnNewSegment(SegmentData segmentData)
+    {
+        double progressPercentage = (segmentData.End / totalDuration) * 100;
+        ProgressChanged?.Invoke(null, new ProgressEventArgs(progressPercentage));
+        Console.WriteLine($"Progress: {progressPercentage:F2}% - Segment: {segmentData.Text} Start: {segmentData.Start} End: {segmentData.End}");
+    }
+
+    // Event handler for progress changes
+    private static void OnProgressChanged(object sender, ProgressEventArgs e)
+    {
+        Console.WriteLine($"Progress: {e.ProgressPercentage:F2}%");
+    }
+}
