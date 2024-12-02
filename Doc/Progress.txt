@@ -53,3 +53,40 @@ public class Program
         Console.WriteLine($"Progress: {e.ProgressPercentage:F2}%");
     }
 }
+
+using System;
+using System.Threading;
+
+class Program
+{
+    static void Main()
+    {
+        Console.WriteLine("This line will stay.");
+        string previousOutput = string.Empty;
+
+        for (int i = 0; i <= 10; i++)
+        {
+            // Create the new content to display
+            string newOutput = $"Progress: {i}";
+
+            // Add spaces to cover any remaining characters from the previous output
+            if (newOutput.Length < previousOutput.Length)
+            {
+                newOutput = newOutput.PadRight(previousOutput.Length);
+            }
+
+            // Write the new output with a carriage return at the start
+            Console.Write($"\r{newOutput}");
+
+            // Update the previous output
+            previousOutput = newOutput;
+
+            // Sleep for a short time to simulate work being done
+            Thread.Sleep(500);
+        }
+
+        // Write a new line after the progress is complete
+        Console.WriteLine();
+    }
+}
+
