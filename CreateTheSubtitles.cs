@@ -84,7 +84,7 @@ namespace SubtitleCreator
                 var endTime = Utilities.ConvertTimespanToSrtFormat(segmentData.End);
                 segments.Add(segmentData);
 
-                int progressPercentage = (segmentData.End.Seconds / durationSeconds) * 100;
+                int progressPercentage = (int)(((double)segmentData.End.Seconds / (double)durationSeconds) * 100.00);
                 ProgressChanged?.Invoke(null, new ProgressEventArgs(progressPercentage));
             }
 
@@ -260,7 +260,7 @@ namespace SubtitleCreator
 
         private static void OnProgressChanged(object? sender, ProgressEventArgs e)
         {
-            string newOutput = $"Progress: {e.ProgressPercentage:F2}%";
+            string newOutput = $"Progress: {e.ProgressPercentage}%";
             newOutput = newOutput.PadRight(10);
             Console.Write($"\r{newOutput}");
         }

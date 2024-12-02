@@ -2,7 +2,7 @@
   "profiles": {
     "SubtitleCreator": {
       "commandName": "Project",
-      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg\\bin\" -infile=\"C:\\TestData\\Barbecue Life of Fire S01E01.mp4\" -model=medium"
+      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg\\bin\" -infile=\"C:\\TestData\\South Park The Spirit of Christmas (Jesus vs  Santa).mp4\" -model=medium -nomerge"
     }
   }
 }
