@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Extensions;
 
@@ -106,7 +107,7 @@ namespace SubtitleCreator
                         if (model != "small" && model != "medium" && model != "large")
                         {
                             paramsOK = false;
-                            Utilities.ConsoleWithLog("Invalid model: " + model);
+                            Utilities.ConsoleWithLog($"Invalid model: {model}. Possible models are small, medium, and large.");
                         }
                         break;
 
@@ -141,9 +142,27 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog($"Attempt to Repair: {attemptToRepair}");
             Utilities.ConsoleWithLog($"Create SDH Subtitles: {useSDH}");
 
+            if (string.IsNullOrEmpty(inFile))
+            {
+                Utilities.ConsoleWithLog($"Parameter inFile must be set.  Exiting.");
+                return;
+            }
+
             if (File.Exists(inFile) == false)
             {
-                Utilities.ConsoleWithLog($"Input file {inFile} does not exist. Exiting.");
+                Utilities.ConsoleWithLog("Input file {inFile} does not exist. Exiting.");
+                return;
+            }
+
+            if(string.IsNullOrEmpty(ffmpegPath))
+            {
+                Utilities.ConsoleWithLog("Parameter ffmpegPath must be set.  Exiting.");
+                return;
+            }
+
+            if (!File.Exists(Path.Combine(ffmpegPath, "ffmpeg.exe")) && !File.Exists(Path.Combine(ffmpegPath, "ffmpeg")))
+            {
+                Utilities.ConsoleWithLog($"ffmpeg executable not found in the selected folder {ffmpegPath}.  Exiting.");
                 return;
             }
 
@@ -151,6 +170,11 @@ namespace SubtitleCreator
                 Utilities.ConsoleWithLog($"Output File: {outputFile}");
             else
                 Utilities.ConsoleWithLog($"SRT File: {srtFile}");
+
+            Utilities.ConsoleWithLog("");
+
+            string videoLength = GetVideoDuration(ffmpegPath, inFile, out int durationSeconds);
+            Utilities.ConsoleWithLog($"Length of the video is {videoLength}.");
 
             Utilities.ConsoleWithLog("");
 
@@ -182,7 +206,7 @@ namespace SubtitleCreator
 
             Utilities.ConsoleWithLog("Creating subtitles file. Please be patient ... ");
             Watch.WatchStart();
-            _ = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, useSDH, audioLanguage);
+            _ = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, useSDH, audioLanguage, durationSeconds);
             Utilities.ConsoleWithLog($"Subtitle creation complete in {Watch.WatchStop()}.");
 
             if (merge == true)
@@ -199,6 +223,37 @@ namespace SubtitleCreator
             }
 
             File.Delete(audioFilePath);
+        }
+
+        public static string GetVideoDuration(string ffmpegPath, string videoFilePath, out int durationSeconds)
+        {
+            var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = Path.Combine(ffmpegPath, "ffprobe"),
+                    Arguments = $"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{videoFilePath}\"",
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                }
+            };
+
+            process.Start();
+            string output = process.StandardOutput.ReadToEnd().Trim();
+            process.WaitForExit();
+
+            if (double.TryParse(output, out double duration))
+            {
+                TimeSpan time = TimeSpan.FromSeconds(duration);
+                durationSeconds = (int)time.TotalSeconds;
+                return $"{time.Hours} hours {time.Minutes} minutes";
+            }
+            else
+            {
+                durationSeconds = 0;
+                return "00:00";
+            }
         }
 
         /// <summary>

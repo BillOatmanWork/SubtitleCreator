@@ -14,9 +14,7 @@ namespace SubtitleCreator
 
     public class CreateTheSubtitles
     {
-        public CreateTheSubtitles()
-        {
-        }
+        private event EventHandler<ProgressEventArgs>? ProgressChanged;
 
         /// <summary>
         /// Generate the subtitles from the audio (wav) file
@@ -29,7 +27,7 @@ namespace SubtitleCreator
         /// <param name="shouldTranslate"></param>
         /// <param name="audioLanguage"></param>
         /// <returns></returns>
-        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string workingDir, string srtFile, string languageCode, bool shouldTranslate, bool useSDH, string audioLanguage)
+        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string workingDir, string srtFile, string languageCode, bool shouldTranslate, bool useSDH, string audioLanguage, int durationSeconds)
         {
             List<SegmentData> segments = new();
 
@@ -57,6 +55,8 @@ namespace SubtitleCreator
             string modelName = Utilities.GgmlTypeToString(ggmlType);
             string modelPath = Path.Combine(workingDir, modelName);
 
+            ProgressChanged += OnProgressChanged;
+
             segments.Clear();
             if (!File.Exists(modelPath))
             {
@@ -83,6 +83,9 @@ namespace SubtitleCreator
                 var startTime = Utilities.ConvertTimespanToSrtFormat(segmentData.Start);
                 var endTime = Utilities.ConvertTimespanToSrtFormat(segmentData.End);
                 segments.Add(segmentData);
+
+                int progressPercentage = (segmentData.End.Seconds / durationSeconds) * 100;
+                ProgressChanged?.Invoke(null, new ProgressEventArgs(progressPercentage));
             }
 
             using (WhisperProcessor? processor = SetupProcessor(modelPath, languageCode, shouldTranslate, audioLanguage, useSDH, OnNewSegment))
@@ -95,12 +98,13 @@ namespace SubtitleCreator
 
                 using (Stream fileStream = File.OpenRead(wavFilePath))
                 {
-                    //GC.KeepAlive(fileStream);
-                    //GC.KeepAlive(processor);
-
                     processor.Process(fileStream);
                 }
             }
+
+            Console.Write("\rProgress: 100%");
+            Console.WriteLine("");
+            Console.WriteLine("");
 
             // Sort segments by start time
             segments.Sort((x, y) => x.Start.CompareTo(y.Start));
@@ -252,6 +256,23 @@ namespace SubtitleCreator
             }
 
             return true;
+        }
+
+        private static void OnProgressChanged(object? sender, ProgressEventArgs e)
+        {
+            string newOutput = $"Progress: {e.ProgressPercentage:F2}%";
+            newOutput = newOutput.PadRight(10);
+            Console.Write($"\r{newOutput}");
+        }
+    }
+
+    public class ProgressEventArgs : EventArgs
+    {
+        public int ProgressPercentage { get; }
+
+        public ProgressEventArgs(int progressPercentage)
+        {
+            ProgressPercentage = progressPercentage;
         }
     }
 }
