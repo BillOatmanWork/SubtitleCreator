@@ -84,7 +84,7 @@ namespace SubtitleCreator
                 var endTime = Utilities.ConvertTimespanToSrtFormat(segmentData.End);
                 segments.Add(segmentData);
 
-                int progressPercentage = (int)(((double)segmentData.End.Seconds / (double)durationSeconds) * 100.00);
+                int progressPercentage = (int)((segmentData.End.TotalSeconds / (double)durationSeconds) * 100.00);
                 ProgressChanged?.Invoke(null, new ProgressEventArgs(progressPercentage));
             }
 
