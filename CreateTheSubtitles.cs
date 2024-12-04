@@ -236,7 +236,7 @@ namespace SubtitleCreator
         public bool DoWorkMergeSubtitles(string srtFile, string inFile, string finalFile, string ffmpegPath, string audioLanguage)
         {
             // Set audio track to correct language
-            string ffmpegArgs = $"-i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt -metadata:s:s:0 language=eng  -metadata:s:a:0 language={audioLanguage} \"{finalFile}\"";
+            string ffmpegArgs = $"-nostdin -i \"{inFile}\" -i \"{srtFile}\" -c copy -c:s srt -metadata:s:s:0 language=eng  -metadata:s:a:0 language={audioLanguage} \"{finalFile}\"";
 
             // Set up the process to run FFmpeg
             using (Process ffmpeg = new Process())
