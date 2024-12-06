@@ -27,7 +27,7 @@ namespace SubtitleCreator
         /// <param name="shouldTranslate"></param>
         /// <param name="audioLanguage"></param>
         /// <returns></returns>
-        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, string workingDir, string srtFile, string languageCode, bool shouldTranslate, bool useSDH, string audioLanguage, int durationSeconds)
+        public bool DoWorkGenerateSubtitles(string wavFilePath, ModelType modelType, bool forceModelUpdate, string workingDir, string srtFile, string languageCode, bool shouldTranslate, bool useSDH, string audioLanguage, int durationSeconds)
         {
             List<SegmentData> segments = new();
 
@@ -56,6 +56,9 @@ namespace SubtitleCreator
             string modelPath = Path.Combine(workingDir, modelName);
 
             ProgressChanged += OnProgressChanged;
+
+            if (forceModelUpdate)
+                File.Delete(modelPath);
 
             segments.Clear();
             if (!File.Exists(modelPath))

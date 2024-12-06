@@ -35,6 +35,7 @@ namespace SubtitleCreator
             bool useSDH = true;
             string outputFile = string.Empty;
             bool attemptToRepair = true;
+            bool forceModelUpdate = false;
 
             bool paramsOK = true;
             foreach (string arg in args)
@@ -53,6 +54,12 @@ namespace SubtitleCreator
                         Utilities.ConsoleWithLog(lang);
 
                     return;
+                }
+
+                if (arg.ToLower() == "-forcemodelupdate")
+                {
+                    forceModelUpdate = true;
+                    continue;
                 }
 
                 if (arg.ToLower() == "-translate")
@@ -141,6 +148,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog($"Translate to English: {translate}");
             Utilities.ConsoleWithLog($"Attempt to Repair: {attemptToRepair}");
             Utilities.ConsoleWithLog($"Create SDH Subtitles: {useSDH}");
+            Utilities.ConsoleWithLog($"Force Whisper Model Update: {forceModelUpdate}");
 
             if (string.IsNullOrEmpty(inFile))
             {
@@ -206,7 +214,7 @@ namespace SubtitleCreator
 
             Utilities.ConsoleWithLog("Creating subtitles file. Please be patient ... ");
             Watch.WatchStart();
-            _ = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, workingDir, srtFile, language, translate, useSDH, audioLanguage, durationSeconds);
+            _ = removeCommercials.DoWorkGenerateSubtitles(audioFilePath, modelType, forceModelUpdate, workingDir, srtFile, language, translate, useSDH, audioLanguage, durationSeconds);
             Utilities.ConsoleWithLog($"Subtitle creation complete in {Watch.WatchStop()}.");
 
             if (merge == true)
@@ -275,6 +283,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.");
             Utilities.ConsoleWithLog("Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.");
             Utilities.ConsoleWithLog("Optional: -noSDH  Do not generate descriptive lines such as [grunting].  By default, the descriptive (SDH) subtitles will be included.");
+            Utilities.ConsoleWithLog("Optional: -forceModelUpdate  Force the update of the Whisper model. If set, the model will be downloaded even if it already exists. Default: false.");
             Utilities.ConsoleWithLog("");
 
             string example = $"SubtitleCreator -ffmpegPath=\"Path\to\ffmpeg folder\" -inFile=\"c:\\My Movies\\My Little Pony.ts\" -Model=Large";
