@@ -158,7 +158,7 @@ namespace SubtitleCreator
 
             if (File.Exists(inFile) == false)
             {
-                Utilities.ConsoleWithLog("Input file {inFile} does not exist. Exiting.");
+                Utilities.ConsoleWithLog($"Input file {inFile} does not exist. Exiting.");
                 return;
             }
 
