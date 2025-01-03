@@ -48,7 +48,7 @@ namespace SubtitleCreator
                     ggmlType = GgmlType.Medium;
                     break;
                 case ModelType.Large:
-                    ggmlType = GgmlType.LargeV3;
+                    ggmlType = GgmlType.LargeV3Turbo;
                     break;
             }
 
