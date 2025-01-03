@@ -2,7 +2,7 @@
   "profiles": {
     "SubtitleCreator": {
       "commandName": "Project",
-      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg\\bin\" -infile=\"C:\\testdata\\Barbecue Life of Fire S01E01.ts\" -model=medium -nomerge"
+      "commandLineArgs": "-ffmpegpath=\"C:\\ffmpeg\\bin\" -infile=\"C:\\testdata\\Barbecue Life of Fire S01E01.ts\" -nomerge"
     }
   }
 }

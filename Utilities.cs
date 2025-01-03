@@ -27,6 +27,7 @@ namespace SubtitleCreator
                 GgmlType.LargeV2 => "large-v2",
                 GgmlType.LargeV1 => "large-v1",
                 GgmlType.LargeV3 => "large-v3",
+                GgmlType.LargeV3Turbo => "large-v3-turbo",
                 GgmlType.Medium => "medium",
                 GgmlType.MediumEn => "medium-en",
                 GgmlType.Small => "small",
