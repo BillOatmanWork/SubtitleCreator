@@ -36,6 +36,7 @@ namespace SubtitleCreator
             string outputFile = string.Empty;
             bool attemptToRepair = true;
             bool forceModelUpdate = false;
+            bool detectAudioLanguage = false;
 
             bool paramsOK = true;
             foreach (string arg in args)
@@ -65,6 +66,12 @@ namespace SubtitleCreator
                 if (arg.ToLower() == "-translate")
                 {
                     translate = true;
+                    continue;
+                }
+
+                if (arg.ToLower() == "-detectaudiolanguage")
+                {
+                    detectAudioLanguage = true;
                     continue;
                 }
 
@@ -134,13 +141,25 @@ namespace SubtitleCreator
                 language = "en";
             }
 
+            if (detectAudioLanguage && string.IsNullOrEmpty(audioLanguage) && audioLanguage != "eng")
+            {
+                Utilities.ConsoleWithLog("AudioLanguage cannot be specified when detect audio language is enabled. Exiting.");
+                return;
+            }
+
+            if (detectAudioLanguage && model != "large")
+            {
+                Utilities.ConsoleWithLog("Language detection requires the large model. Exiting.");
+                return;
+            }
+
             if (merge == true)
                 outputFile = $"{inFile.FullFileNameWithoutExtention()}_subs.mkv";
 
             string fNameLang = string.IsNullOrEmpty(language) ? "" : language;
             string srtFile = $"{inFile.FullFileNameWithoutExtention()}.{fNameLang}.srt";
 
-            string audioLanguageLong = WhisperLanguageMapper.GetLanguageFullName(audioLanguage);
+            string audioLanguageLong = detectAudioLanguage == false ? WhisperLanguageMapper.GetLanguageFullName(audioLanguage) : "Being detected";
 
             Utilities.ConsoleWithLog($"ffmpeg Path: {ffmpegPath}");
             Utilities.ConsoleWithLog($"Input File: {inFile}");
@@ -195,6 +214,24 @@ namespace SubtitleCreator
                 return;
             }
             Utilities.ConsoleWithLog($"Audio extraction complete in {Watch.WatchStop()}.");
+
+            if(detectAudioLanguage)
+            {
+                Utilities.ConsoleWithLog("Detecting the language of the audio ... ");
+                Watch.WatchStart();
+
+                string? detectedLanguage = DetectAudioLanguage.DetectLanguage(Path.Combine(workingDir, Utilities.Models), audioFilePath);
+                if (string.IsNullOrEmpty(detectedLanguage))
+                {
+                    Utilities.ConsoleWithLog("Audio language detection failed. Exiting.");
+                    File.Delete(audioFilePath);
+                    return;
+                }
+
+                Utilities.ConsoleWithLog($"Language detection complete in {Watch.WatchStop()}.");
+
+                audioLanguage = detectedLanguage;
+            }
 
             CreateTheSubtitles removeCommercials = new CreateTheSubtitles();
 
@@ -278,7 +315,8 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("");
             Utilities.ConsoleWithLog("Optional: -noMerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this is used, the MKV container will not be created and the subtitle file will not be deleted.");
             Utilities.ConsoleWithLog("Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.");
-            Utilities.ConsoleWithLog("Optional: -audioLanguage=<language>  The Whisper audio language detection feature has problems now.  So this should be specified if the audio is not in english. English is the default.");
+            Utilities.ConsoleWithLog("Optional: -detectAudioLanguage Automatically detect the language of the audio. Set the audioLanguage parameter if this is false. Default false.");
+            Utilities.ConsoleWithLog("Optional: -audioLanguage=<language>  Set this if detectAudioLanguage is false and the audio is not in english. English is the default.");
             Utilities.ConsoleWithLog("Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is en.");
             Utilities.ConsoleWithLog("Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but can be slower. Default = Large.");
             Utilities.ConsoleWithLog("Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.");

@@ -12,7 +12,8 @@ It uses [Whisper.NET](https://github.com/sandrohanea/whisper.net) and [ffmpeg](h
 - -inFile=The video file the subtitles will be generated for.
 - Optional: -nomerge  By default once the subtitle file is created, it is merged into a MKV container along with the video file. If this parameter is used, the MKV container will not be created and the subtitle file will not be deleted.
 - Optional: -translate  If this is used, subtitles will be translated to English.  Do not use if the audio is already in English.
-- Optional: -audioLanguage=<language>  The Whisper audio language detection feature has problems now.  So this should be specified if the audio is not in english. English is the default.
+- Optional: -detectAudioLanguage Automatically detect the language of the audio. Set the audioLanguage parameter if this is false. Default false.
+- Optional: -audioLanguage=<language>  Set this if detectAudioLanguage is false and the audio is not in english. English is the default.
 - Optional: -language=The language of the audio and therefore the subtitles. en for example is english. This is used for the naming of the subtitles file. Default is none.
 - Optional: -Model=<Language Model>  Options are Small/Medium/Large.  Bigger is better quality, but also slower. Default = Medium.
 - Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.
