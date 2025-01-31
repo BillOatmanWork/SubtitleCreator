@@ -10,13 +10,13 @@ namespace SubtitleCreator
         {
             var whisperFactory = WhisperFactory.FromPath(pathToModel);
             var whisper = whisperFactory.CreateBuilder().WithLanguageDetection().Build();
-            var floatAudioData = LoadFirst30SecondsAsFloatArray(pathToAudioFile);
+            var floatAudioData = Load30SecondsAsFloatArray(pathToAudioFile);
             var detectedLanguage = whisper.DetectLanguage(floatAudioData);
 
             return detectedLanguage;
         }
 
-        private static float[] LoadFirst30SecondsAsFloatArray(string pathToAudioFile)
+        private static float[] Load30SecondsAsFloatArray(string pathToAudioFile)
         {
             using (var reader = new BinaryReader(File.OpenRead(pathToAudioFile)))
             {
@@ -31,8 +31,17 @@ namespace SubtitleCreator
                 int bytesPerSecond = sampleRate * bytesPerSample * numChannels;
                 int bytesToRead = bytesPerSecond * 30;
 
+                // Determine the starting point
+                long fileLength = reader.BaseStream.Length;
+                long startPosition = fileLength > bytesPerSecond * 360 ? bytesPerSecond * 300 + 44 : 44;
+
+                // Seek to the starting position
+                reader.BaseStream.Seek(startPosition, SeekOrigin.Begin);
+
+                // Read the audio data
                 var byteArray = reader.ReadBytes(bytesToRead);
 
+                // Convert byte array to float array
                 int floatCount = byteArray.Length / bytesPerSample;
                 float[] floatArray = new float[floatCount];
 
