@@ -8,15 +8,21 @@ namespace SubtitleCreator
     {
         public static string? DetectLanguage(string pathToModel, string pathToAudioFile)
         {
+            if (new CreateTheSubtitles().GetModel(string.Empty, pathToModel) is false)
+            {
+                Utilities.ConsoleWithLog("Something went wrong while downloading the Whisper model.");
+                return null;
+            }
+
             var whisperFactory = WhisperFactory.FromPath(pathToModel);
             var whisper = whisperFactory.CreateBuilder().WithLanguageDetection().Build();
-            var floatAudioData = Load30SecondsAsFloatArray(pathToAudioFile);
+            var floatAudioData = Load60SecondsAsFloatArray(pathToAudioFile);
             var detectedLanguage = whisper.DetectLanguage(floatAudioData);
 
             return detectedLanguage;
         }
 
-        private static float[] Load30SecondsAsFloatArray(string pathToAudioFile)
+        private static float[] Load60SecondsAsFloatArray(string pathToAudioFile)
         {
             using (var reader = new BinaryReader(File.OpenRead(pathToAudioFile)))
             {
@@ -26,14 +32,14 @@ namespace SubtitleCreator
                 int bitsPerSample = BitConverter.ToInt16(header, 34);
                 int numChannels = BitConverter.ToInt16(header, 22);
 
-                // Calculate the number of bytes for 30 seconds of audio
+                // Calculate the number of bytes for 60 seconds of audio
                 int bytesPerSample = bitsPerSample / 8;
                 int bytesPerSecond = sampleRate * bytesPerSample * numChannels;
-                int bytesToRead = bytesPerSecond * 30;
+                int bytesToRead = bytesPerSecond * 60;
 
                 // Determine the starting point
                 long fileLength = reader.BaseStream.Length;
-                long startPosition = fileLength > bytesPerSecond * 360 ? bytesPerSecond * 300 + 44 : 44;
+                long startPosition = fileLength > bytesPerSecond * 660 ? bytesPerSecond * 600 + 44 : 44;
 
                 // Seek to the starting position
                 reader.BaseStream.Seek(startPosition, SeekOrigin.Begin);

@@ -220,7 +220,7 @@ namespace SubtitleCreator
                 Utilities.ConsoleWithLog("Detecting the language of the audio ... ");
                 Watch.WatchStart();
 
-                string? detectedLanguage = DetectAudioLanguage.DetectLanguage(Path.Combine(workingDir, Utilities.Models), audioFilePath);
+                string? detectedLanguage = DetectAudioLanguage.DetectLanguage(workingDir, audioFilePath);
                 if (string.IsNullOrEmpty(detectedLanguage))
                 {
                     Utilities.ConsoleWithLog("Audio language detection failed. Exiting.");

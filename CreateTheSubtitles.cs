@@ -61,24 +61,11 @@ namespace SubtitleCreator
                 File.Delete(modelPath);
 
             segments.Clear();
-            if (!File.Exists(modelPath))
-            {
-                Utilities.ConsoleWithLog($"Downloading Whisper model {modelName}.");
-                try
-                {
-                    using (Stream modelStream = WhisperGgmlDownloader.GetGgmlModelAsync(ggmlType).GetAwaiter().GetResult())
-                    using (FileStream fileWriter = File.OpenWrite(modelPath))
-                    {
-                        modelStream.CopyTo(fileWriter);
-                    }
 
-                    Utilities.ConsoleWithLog("Whisper model download complete.");
-                }
-                catch (Exception ex)
-                {
-                    Utilities.ConsoleWithLog($"Exception downloading model: {ex.Message}");
-                    return false;
-                }
+            if(GetModel(modelName, modelPath) is false)
+            {
+                Utilities.ConsoleWithLog("Something went wrong while downloading the Whisper model.");
+                return false;
             }
 
             void OnNewSegment(SegmentData segmentData)
@@ -155,6 +142,33 @@ namespace SubtitleCreator
             }
 
             Utilities.ConsoleWithLog("Subtitle Generation Complete.");
+
+            return true;
+        }
+
+        public bool GetModel(string modelName, string modelPath)
+        {
+            if (!File.Exists(modelPath))
+            {
+                GgmlType ggmlType = GgmlType.LargeV3Turbo;
+
+                Utilities.ConsoleWithLog($"Downloading Whisper model {modelName}");
+                try
+                {
+                    using (Stream modelStream = WhisperGgmlDownloader.GetGgmlModelAsync(ggmlType).GetAwaiter().GetResult())
+                    using (FileStream fileWriter = File.OpenWrite(modelPath))
+                    {
+                        modelStream.CopyTo(fileWriter);
+                    }
+
+                    Utilities.ConsoleWithLog("Whisper model download complete.");
+                }
+                catch (Exception ex)
+                {
+                    Utilities.ConsoleWithLog($"Exception downloading model: {ex.Message}");
+                    return false;
+                }
+            }
 
             return true;
         }
