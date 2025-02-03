@@ -18,7 +18,7 @@ namespace SubtitleCreator
         /// </summary>
         /// <param name="modelType"></param>
         /// <returns></returns>
-        public static string GgmlTypeToString(GgmlType modelType)
+        public static string GgmlTypeToString(GgmlType? modelType)
         {
             var modelTypeString = modelType switch
             {

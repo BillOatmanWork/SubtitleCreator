@@ -62,7 +62,7 @@ namespace SubtitleCreator
 
             segments.Clear();
 
-            if(GetModel(modelName, modelPath) is false)
+            if(GetModel(workingDir, ggmlType) is false)
             {
                 Utilities.ConsoleWithLog("Something went wrong while downloading the Whisper model.");
                 return false;
@@ -146,26 +146,29 @@ namespace SubtitleCreator
             return true;
         }
 
-        public bool GetModel(string modelName, string modelPath)
+        public bool GetModel(string modelPath, GgmlType? _ggmlType)
         {
-            if (!File.Exists(modelPath))
-            {
-                GgmlType ggmlType = GgmlType.LargeV3Turbo;
+            GgmlType ggmlType = _ggmlType ?? GgmlType.LargeV3Turbo;
 
+            string modelName = Utilities.GgmlTypeToString(ggmlType);
+            string modelFileName = Path.Combine(modelPath, modelName);
+
+            if (!File.Exists(modelFileName))
+            {
                 Utilities.ConsoleWithLog($"Downloading Whisper model {modelName}");
                 try
                 {
                     using (Stream modelStream = WhisperGgmlDownloader.GetGgmlModelAsync(ggmlType).GetAwaiter().GetResult())
-                    using (FileStream fileWriter = File.OpenWrite(modelPath))
+                    using (FileStream fileWriter = File.OpenWrite(modelFileName))
                     {
                         modelStream.CopyTo(fileWriter);
                     }
 
-                    Utilities.ConsoleWithLog("Whisper model download complete.");
+                    Utilities.ConsoleWithLog($"Whisper model {modelName} download complete.");
                 }
                 catch (Exception ex)
                 {
-                    Utilities.ConsoleWithLog($"Exception downloading model: {ex.Message}");
+                    Utilities.ConsoleWithLog($"Exception downloading model {modelName}: {ex.Message}");
                     return false;
                 }
             }

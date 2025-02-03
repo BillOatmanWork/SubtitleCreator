@@ -8,7 +8,7 @@ namespace SubtitleCreator
     {
         public static string? DetectLanguage(string pathToModel, string pathToAudioFile)
         {
-            if (new CreateTheSubtitles().GetModel(string.Empty, pathToModel) is false)
+            if (new CreateTheSubtitles().GetModel(pathToModel, null) is false)
             {
                 Utilities.ConsoleWithLog("Something went wrong while downloading the Whisper model.");
                 return null;
