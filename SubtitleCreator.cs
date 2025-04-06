@@ -37,6 +37,7 @@ namespace SubtitleCreator
             bool attemptToRepair = true;
             bool forceModelUpdate = false;
             bool detectAudioLanguage = false;
+            bool shutdown = false;
 
             bool paramsOK = true;
             foreach (string arg in args)
@@ -60,6 +61,12 @@ namespace SubtitleCreator
                 if (arg.ToLower() == "-forcemodelupdate")
                 {
                     forceModelUpdate = true;
+                    continue;
+                }
+
+                if (arg.ToLower() == "-shutdown")
+                {
+                    shutdown = true;
                     continue;
                 }
 
@@ -168,6 +175,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog($"Attempt to Repair: {attemptToRepair}");
             Utilities.ConsoleWithLog($"Create SDH Subtitles: {useSDH}");
             Utilities.ConsoleWithLog($"Force Whisper Model Update: {forceModelUpdate}");
+            Utilities.ConsoleWithLog($"Shutdown when Complete: {shutdown}");
 
             if (string.IsNullOrEmpty(inFile))
             {
@@ -268,6 +276,12 @@ namespace SubtitleCreator
             }
 
             File.Delete(audioFilePath);
+
+            if (shutdown)
+            {
+                Utilities.ConsoleWithLog("The system will be shutdown in 15 seconds.");
+                Process.Start("shutdown", "/s /t 15");
+            }
         }
 
         public static string GetVideoDuration(string ffmpegPath, string videoFilePath, out int durationSeconds)
@@ -322,6 +336,7 @@ namespace SubtitleCreator
             Utilities.ConsoleWithLog("Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.");
             Utilities.ConsoleWithLog("Optional: -noSDH  Do not generate descriptive lines such as [grunting].  By default, the descriptive (SDH) subtitles will be included.");
             Utilities.ConsoleWithLog("Optional: -forceModelUpdate  Force the update of the Whisper model. If set, the model will be downloaded even if it already exists. Default: false.");
+            Utilities.ConsoleWithLog("Optional: -shutdown If set, the system will be shutdown when finished. This will likely only work with Windows.  Default: false.");
             Utilities.ConsoleWithLog("");
 
             string example = $"SubtitleCreator -ffmpegPath=\"Path\to\ffmpeg folder\" -inFile=\"c:\\My Movies\\My Little Pony.ts\" -Model=Large";

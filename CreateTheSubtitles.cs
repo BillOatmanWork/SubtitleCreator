@@ -142,7 +142,6 @@ namespace SubtitleCreator
             }
 
             Utilities.ConsoleWithLog("Subtitle Generation Complete.");
-
             return true;
         }
 
@@ -158,7 +157,7 @@ namespace SubtitleCreator
                 Utilities.ConsoleWithLog($"Downloading Whisper model {modelName}");
                 try
                 {
-                    using (Stream modelStream = WhisperGgmlDownloader.GetGgmlModelAsync(ggmlType).GetAwaiter().GetResult())
+                    using (Stream modelStream = WhisperGgmlDownloader.Default.GetGgmlModelAsync(ggmlType).GetAwaiter().GetResult())
                     using (FileStream fileWriter = File.OpenWrite(modelFileName))
                     {
                         modelStream.CopyTo(fileWriter);
