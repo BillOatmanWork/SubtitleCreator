@@ -40,5 +40,9 @@ For a list of possible audioLanguages, run SubtitleCreator -LanguageList.
 ## Note
 Based on my testing, using the medium model does a great job.  However, depending upon the strength of your machine running this app, it can take quite a while to generate the subtitles.  My box is several years old and by no means a supercomputer but not a boat anchor either, a recording that was 66 minutes in length took 60 minutes to generate the SRT file.  
 
+## Note
+SubtitleCreator is CharityWare. If you like this program and find it of value, please consider making a
+donation to a local charity that benefits children such as Special Olympics.
+
 ## Thanks to
 - [@trananh1992](https://github.com/trananh1992/WinWhisper-SRT) for creating the WinWhisper-SRT project.
