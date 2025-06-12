@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using Extensions;
 
 namespace SubtitleCreator
@@ -279,8 +280,9 @@ namespace SubtitleCreator
 
             if (shutdown)
             {
-                Utilities.ConsoleWithLog("The system will be shutdown in 15 seconds.");
-                Process.Start("shutdown", "/s /t 15");
+                Utilities.ConsoleWithLog("The system will be shutdown in 30 seconds. CTRL-C to abort.");
+                Thread.Sleep(30000);
+                Process.Start("shutdown", "/s /t 0");
             }
         }
 
