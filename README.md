@@ -19,7 +19,7 @@ It uses [Whisper.NET](https://github.com/sandrohanea/whisper.net) and [ffmpeg](h
 - Optional: -noRepair  Sometimes a recording will have audio errors that stop the processing.  By default, the app will attempt to make repairs.  Use of this flag aborts the repair and the app just fails.
 - Optional: -noSDH Do not generate descriptive lines such as [grunting]. By default, the descriptive (SDH) subtitles will be included.
 - Optional: -forceModelUpdate  Force the update of the Whisper model. If set, the model will be downloaded even if it already exists. Default: false.
-- Optional: -shutDown  Force the update of the Whisper model. If set, the system will be shutdown when complete. Note: Likely this only works on Windows.
+- Optional: -shutDown  If set, the system will be shutdown when complete. Note that this likely only works on Windows.
   
 ## Example
 For the Emby software package (and I believe also for Jellyfin and Plex) you can specify a command to be executed after a recording has completed.  
@@ -39,6 +39,10 @@ For a list of possible audioLanguages, run SubtitleCreator -LanguageList.
 
 ## Note
 Based on my testing, using the medium model does a great job.  However, depending upon the strength of your machine running this app, it can take quite a while to generate the subtitles.  My box is several years old and by no means a supercomputer but not a boat anchor either, a recording that was 66 minutes in length took 60 minutes to generate the SRT file.  
+
+## Note
+SubtitleCreator is CharityWare. If you like this program and find it of value, please consider making a
+donation to a local charity that benefits children such as Special Olympics.
 
 ## Thanks to
 - [@trananh1992](https://github.com/trananh1992/WinWhisper-SRT) for creating the WinWhisper-SRT project.
