@@ -115,29 +115,70 @@ namespace SubtitleCreator
                     if (startTime == endTime || segment.Text.Trim().Length == 0)
                         continue;
 
-                    writer.WriteLine(++subtitleIndex);
-                    writer.WriteLine($"{startTime} --> {endTime}");
+                    // Break the text with max 40 characters per line and max 2 lines (80 chars total) per block
+                    var text = segment.Text.Trim();
+                    var allLines = new List<string>();
 
-                    // Break the text in max 42 characters, but split only on white space
-                    var parts = new List<string>();
+                    // Split entire text into lines of max 40 characters
                     var index = 0;
-                    while (index < segment.Text.Length)
+                    while (index < text.Length)
                     {
-                        if (segment.Text.Length - index <= 42)
+                        var remaining = text.Length - index;
+                        if (remaining <= 40)
                         {
-                            parts.Add(segment.Text[index..]);
+                            allLines.Add(text[index..]);
                             break;
                         }
 
-                        var lastSpace = segment.Text.Substring(index, 42).LastIndexOf(' ');
-                        parts.Add(segment.Text.Substring(index, lastSpace));
-                        index += lastSpace + 1;
+                        // Find the last space within 40 characters
+                        var searchLength = Math.Min(40, remaining);
+                        var lastSpace = text.Substring(index, searchLength).LastIndexOf(' ');
+
+                        if (lastSpace > 0)
+                        {
+                            allLines.Add(text.Substring(index, lastSpace));
+                            index += lastSpace + 1;
+                        }
+                        else
+                        {
+                            // No space found, force break at 40 chars
+                            allLines.Add(text.Substring(index, searchLength));
+                            index += searchLength;
+                        }
                     }
 
-                    foreach (string part in parts)
-                        writer.WriteLine(part.Trim());
+                    // Group lines into blocks of max 2 lines each
+                    var blocks = new List<List<string>>();
+                    for (int i = 0; i < allLines.Count; i += 2)
+                    {
+                        var block = new List<string>();
+                        block.Add(allLines[i]);
+                        if (i + 1 < allLines.Count)
+                            block.Add(allLines[i + 1]);
+                        blocks.Add(block);
+                    }
 
-                    writer.WriteLine();
+                    // Calculate time duration for each block
+                    var totalDuration = segment.End - segment.Start;
+                    var durationPerBlock = TimeSpan.FromTicks(totalDuration.Ticks / blocks.Count);
+
+                    // Write each block as a separate subtitle entry
+                    for (int i = 0; i < blocks.Count; i++)
+                    {
+                        var blockStart = segment.Start + TimeSpan.FromTicks(durationPerBlock.Ticks * i);
+                        var blockEnd = (i == blocks.Count - 1) ? segment.End : blockStart + durationPerBlock;
+
+                        var blockStartTime = Utilities.ConvertTimespanToSrtFormat(blockStart);
+                        var blockEndTime = Utilities.ConvertTimespanToSrtFormat(blockEnd);
+
+                        writer.WriteLine(++subtitleIndex);
+                        writer.WriteLine($"{blockStartTime} --> {blockEndTime}");
+
+                        foreach (string line in blocks[i])
+                            writer.WriteLine(line);
+
+                        writer.WriteLine();
+                    }
                 }
             }
 
