@@ -282,7 +282,7 @@ namespace SubtitleCreator
             {
                 Utilities.ConsoleWithLog("The system will be shutdown in 30 seconds. CTRL-C to abort.");
                 Thread.Sleep(30000);
-                Process.Start("shutdown", "/s /t 0");
+                Process.Start("shutdown", "/f /s /t 0");
             }
         }
 
