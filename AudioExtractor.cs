@@ -4,6 +4,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using NAudio.Wave;
 
 namespace SubtitleCreator
@@ -27,6 +28,12 @@ namespace SubtitleCreator
         {
             string newVideoFilePath = videoFilePath;
             bool tempFileCreated = false;
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Utilities.ConsoleWithLog("Running on non-Windows platform, using ffmpeg for audio extraction.");
+                return ExtractAudioWithFfmpeg(videoFilePath, ffmpegPath);
+            }
 
             if (Path.GetExtension(videoFilePath).ToLower() == ".mkv")
             {
@@ -129,7 +136,7 @@ namespace SubtitleCreator
             // Set up the process to run FFmpeg
             using (Process ffmpeg = new Process())
             {
-                ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
+                ffmpeg.StartInfo.FileName = Path.Combine(ffmpegPath, "ffmpeg");
                 ffmpeg.StartInfo.Arguments = ffmpegArgs;
                 ffmpeg.StartInfo.RedirectStandardError = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
@@ -155,7 +162,7 @@ namespace SubtitleCreator
             // Set up the process to run FFmpeg
             using (Process ffmpeg = new Process())
             {
-                ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
+                ffmpeg.StartInfo.FileName = Path.Combine(ffmpegPath, "ffmpeg");
                 ffmpeg.StartInfo.Arguments = ffmpegArgs;
                 ffmpeg.StartInfo.RedirectStandardError = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
@@ -170,6 +177,27 @@ namespace SubtitleCreator
             }
 
             return intermediateFilePath;
+        }
+
+        private static string ExtractAudioWithFfmpeg(string videoFilePath, string ffmpegPath)
+        {
+            outputFilePath = Path.Combine(Path.GetDirectoryName(videoFilePath) ?? string.Empty, $"{Path.GetFileNameWithoutExtension(videoFilePath)}{fileNameIdentifier}.wav");
+            string ffmpegArgs = $"-i \"{videoFilePath}\" -vn -acodec pcm_s16le -ar 16000 -ac 1 \"{outputFilePath}\"";
+
+            using (Process ffmpeg = new Process())
+            {
+                ffmpeg.StartInfo.FileName = Path.Combine(ffmpegPath, "ffmpeg");
+                ffmpeg.StartInfo.Arguments = ffmpegArgs;
+                ffmpeg.StartInfo.RedirectStandardError = true;
+                ffmpeg.StartInfo.UseShellExecute = false;
+                ffmpeg.StartInfo.CreateNoWindow = true;
+
+                ffmpeg.Start();
+                string output = ffmpeg.StandardError.ReadToEnd();
+                ffmpeg.WaitForExit();
+            }
+
+            return outputFilePath;
         }
     }
 }

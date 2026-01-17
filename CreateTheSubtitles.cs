@@ -301,7 +301,7 @@ namespace SubtitleCreator
             // Set up the process to run FFmpeg
             using (Process ffmpeg = new Process())
             {
-                ffmpeg.StartInfo.FileName = $"\"{ffmpegPath}\\ffmpeg\"";
+                ffmpeg.StartInfo.FileName = Path.Combine(ffmpegPath, "ffmpeg");
                 ffmpeg.StartInfo.Arguments = ffmpegArgs;
                 ffmpeg.StartInfo.RedirectStandardError = true;
                 ffmpeg.StartInfo.UseShellExecute = false;
